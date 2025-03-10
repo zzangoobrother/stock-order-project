@@ -3,3 +3,7 @@
 #### 시퀀스 다이어그램
 
 ![sequence_diagram.png](image/sequence_diagram.png)
+
+#### ERD
+
+![erd.png](image/erd.png)
