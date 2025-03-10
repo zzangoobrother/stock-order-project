@@ -1,1 +1,12 @@
+pluginManagement {
+    plugins {
+        id 'org.springframework.boot' version "${springBootVersion}"
+        id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+    }
+}
+
 rootProject.name = 'stock-order-project'
+
+include(
+        "item-api"
+)
