@@ -4,4 +4,6 @@ import com.example.itemapi.domain.model.Item;
 
 public interface ItemRepository {
     Item save(Item item);
+
+    boolean existsBy(String name);
 }

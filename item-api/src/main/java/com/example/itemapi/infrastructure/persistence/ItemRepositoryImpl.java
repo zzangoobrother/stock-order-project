@@ -1,9 +1,11 @@
 package com.example.itemapi.infrastructure.persistence;
 
+import org.springframework.stereotype.Repository;
+
 import com.example.itemapi.domain.model.Item;
 import com.example.itemapi.domain.repository.ItemRepository;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
 @Repository
@@ -14,5 +16,10 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public Item save(Item item) {
         return repository.save(item);
+    }
+
+    @Override
+    public boolean existsBy(String name) {
+        return repository.existsByName(name);
     }
 }
