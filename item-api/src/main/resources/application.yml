@@ -1,10 +1,9 @@
 spring:
   datasource:
-    hikari:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      jdbc-url: jdbc:mysql://localhost:3306/restaurant?useUnicode=true&serverTimezone=Asia/Seoul&autoReconnect=true&rewriteBatchedStatements=true
-      username: root
-      password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ecommerce?useUnicode=true&serverTimezone=Asia/Seoul&autoReconnect=true&rewriteBatchedStatements=true
+    username: test
+    password: 1234
 
   jpa:
     hibernate:
