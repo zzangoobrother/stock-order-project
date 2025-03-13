@@ -31,4 +31,8 @@ public class ItemManager {
 
         // TODO : 캐시 동기화 적용 해야함, 로컬 캐시 동기화 예정이라 Redis pub/sub 사용 예정
     }
+
+    public Item getBy(Long itemId) {
+        return itemRepository.findByItemId(itemId).orElseThrow(() -> new IllegalArgumentException("해당 품목이 존재하지 않습니다."));
+    }
 }

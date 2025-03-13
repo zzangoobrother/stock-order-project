@@ -50,4 +50,8 @@ public class Item {
             throw new IllegalArgumentException("재고를 0 이상 입력해주세요.");
         }
     }
+
+    public String getPriceToString() {
+        return this.price.toString();
+    }
 }
