@@ -1,12 +1,14 @@
 package com.example.itemapi.interfaces.presentation.request;
 
+import java.math.BigDecimal;
+
 import lombok.Builder;
 
 public record ItemRequest() {
 
     public record AddItem(
             String name,
-            int price,
+            BigDecimal price,
             int stock
     ) {
         @Builder
