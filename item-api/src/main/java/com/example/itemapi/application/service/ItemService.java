@@ -1,5 +1,7 @@
 package com.example.itemapi.application.service;
 
+import java.math.BigDecimal;
+
 import com.example.itemapi.application.service.dto.ItemServiceDto;
 import com.example.itemapi.domain.manager.ItemManager;
 import com.example.itemapi.domain.model.Item;
@@ -16,7 +18,7 @@ public class ItemService {
      * - 제품을 추가한다.
      * - 같은 제품명이 있는지 확인한다.
      */
-    public void addItem(String name, int price, int stock) {
+    public void addItem(String name, BigDecimal price, int stock) {
         itemManager.addItem(name, price, stock);
     }
 
