@@ -21,7 +21,7 @@ public class ItemController {
     }
 
     @GetMapping("/items/{itemId}")
-    public ItemInfoResponse getBy(@PathVariable Long itemId) {
+    public ItemInfoResponse getBy(@PathVariable(name = "itemId") Long itemId) {
         return ItemInfoResponse.toItemInfoResponse(itemService.getBy(itemId));
     }
 }
