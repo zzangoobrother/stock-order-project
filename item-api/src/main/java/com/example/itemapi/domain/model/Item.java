@@ -62,6 +62,6 @@ public class Item {
     }
 
     public String getPriceToString() {
-        return this.price.toString();
+        return this.price.getValue().toString();
     }
 }
