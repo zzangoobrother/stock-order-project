@@ -18,7 +18,7 @@ public class ItemManager {
     private final ItemRepository itemRepository;
 
     public void addItem(String name, BigDecimal price, int stock) {
-        if (itemRepository.existsBy(name.trim())) {
+        if (itemRepository.existsBy(name)) {
             throw new IllegalArgumentException("동일한 품목명이 존재합니다.");
         }
 
