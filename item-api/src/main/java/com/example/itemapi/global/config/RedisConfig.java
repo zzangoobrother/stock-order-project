@@ -1,5 +1,6 @@
 package com.example.itemapi.global.config;
 
+import com.example.itemapi.global.utils.ObjectMapperUtils;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -26,7 +27,7 @@ public class RedisConfig {
                 .allowIfSubType(Object.class)
                 .build();
 
-        ObjectMapper mapper = new ObjectMapper()
+        ObjectMapper mapper = ObjectMapperUtils.objectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .registerModule(new JavaTimeModule())
                 .activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.NON_FINAL)

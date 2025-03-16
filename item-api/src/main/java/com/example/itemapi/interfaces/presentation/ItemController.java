@@ -17,7 +17,7 @@ public class ItemController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/items")
     public void addItem(@RequestBody ItemRequest.AddItem request) {
-        itemService.addItem(request.name(), request.price(), request.stock());
+        itemService.addItem(request.name().trim(), request.price(), request.stock());
     }
 
     @GetMapping("/items/{itemId}")
