@@ -10,23 +10,25 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EnableCaching
 public class LocalCacheConfig {
 
     @Bean
-    public CacheManager cacheManager() {
+    public CacheManager simpleCacheManager() {
         SimpleCacheManager cacheManager = new SimpleCacheManager();
-        List<CaffeineCache> caches = Arrays.stream(CacheType.values())
+        cacheManager.setCaches(createdCaffeineCache());
+        return cacheManager;
+    }
+
+    @Bean
+    public List<CaffeineCache> createdCaffeineCache() {
+        return Arrays.stream(CacheType.values())
                 .map(it -> new CaffeineCache(it.getCacheName(), Caffeine.newBuilder().recordStats()
-                        .expireAfterWrite(it.getExpiredAfterWrite(), TimeUnit.SECONDS)
+                        .expireAfterWrite(it.getExpiredAfterWrite())
                         .maximumSize(it.getMaximumSize())
                         .build()))
                 .toList();
-
-        cacheManager.setCaches(caches);
-        return cacheManager;
     }
 }
