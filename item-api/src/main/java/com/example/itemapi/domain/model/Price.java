@@ -1,7 +1,5 @@
 package com.example.itemapi.domain.model;
 
-import java.math.BigDecimal;
-
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,14 +14,14 @@ public class Price {
     private BigDecimal value;
 
     public Price(BigDecimal value) {
-        if (negativeCheck()) {
+        if (negativeCheck(value)) {
             throw new IllegalArgumentException("가격은 음수가 입력될 수 없습니다.");
         }
-        
+
         this.value = value;
     }
 
-    public boolean negativeCheck() {
+    public boolean negativeCheck(BigDecimal value) {
         return value.compareTo(BigDecimal.ZERO) < 0;
     }
 }
