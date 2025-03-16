@@ -39,6 +39,7 @@ public class ItemManager {
     }
 
     @Transactional
+    @DistributedLock(key = "'decrease:stock:' + #itemId")
     public void decreaseStock(Long itemId, int decreaseCount) {
         Item item = itemRepository.findByItemId(itemId).orElseThrow(() -> new IllegalArgumentException("해당 품목이 존재하지 않습니다."));
         item.decreaseStock(decreaseCount);
