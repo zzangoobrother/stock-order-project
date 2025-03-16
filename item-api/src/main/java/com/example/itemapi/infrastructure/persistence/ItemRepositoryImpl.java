@@ -7,6 +7,8 @@ import com.example.itemapi.domain.repository.ItemRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Repository
 public class ItemRepositoryImpl implements ItemRepository {
@@ -21,5 +23,10 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public boolean existsBy(String name) {
         return repository.existsByName(name);
+    }
+
+    @Override
+    public Optional<Item> findByItemId(Long itemId) {
+        return repository.findById(itemId);
     }
 }
