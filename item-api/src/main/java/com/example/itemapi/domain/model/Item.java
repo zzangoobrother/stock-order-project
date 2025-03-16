@@ -1,21 +1,13 @@
 package com.example.itemapi.domain.model;
 
-import java.math.BigDecimal;
-
-import org.springframework.util.StringUtils;
-
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
+
+import java.math.BigDecimal;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -63,5 +55,13 @@ public class Item {
 
     public String getPriceToString() {
         return this.price.getValue().toString();
+    }
+
+    public void decreaseStock(int decreaseCount) {
+        if (this.stock < decreaseCount) {
+            throw new IllegalArgumentException("재고가 부족합니다.");
+        }
+
+        this.stock -= decreaseCount;
     }
 }

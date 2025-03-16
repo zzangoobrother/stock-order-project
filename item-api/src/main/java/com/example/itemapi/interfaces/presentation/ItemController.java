@@ -24,4 +24,9 @@ public class ItemController {
     public ItemInfoResponse getBy(@PathVariable(name = "itemId") Long itemId) {
         return ItemInfoResponse.toItemInfoResponse(itemService.getBy(itemId));
     }
+
+    @PostMapping("/items/itemId/decrease-stock")
+    public void decreaseStock(@PathVariable Long itemId, @RequestBody ItemRequest.DecreaseStock decreaseStock) {
+        itemService.decreaseStock(itemId, decreaseStock.decreaseCount());
+    }
 }

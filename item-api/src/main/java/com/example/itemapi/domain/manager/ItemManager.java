@@ -1,15 +1,14 @@
 package com.example.itemapi.domain.manager;
 
-import java.math.BigDecimal;
-
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Component;
-
 import com.example.itemapi.domain.model.Item;
 import com.example.itemapi.domain.repository.ItemRepository;
-
+import com.example.itemapi.global.annotaion.DistributedLock;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 
 @RequiredArgsConstructor
 @Component
@@ -37,5 +36,13 @@ public class ItemManager {
     @Cacheable(cacheNames = "itemInfo", key = "'itemInfo:' + #itemId", value = "itemInfo")
     public Item getBy(Long itemId) {
         return itemRepository.findByItemId(itemId).orElseThrow(() -> new IllegalArgumentException("해당 품목이 존재하지 않습니다."));
+    }
+
+    @Transactional
+    public void decreaseStock(Long itemId, int decreaseCount) {
+        Item item = itemRepository.findByItemId(itemId).orElseThrow(() -> new IllegalArgumentException("해당 품목이 존재하지 않습니다."));
+        item.decreaseStock(decreaseCount);
+
+        // 캐시 동기화
     }
 }
