@@ -24,11 +24,13 @@ public class Item {
     private String name;
 
     @Embedded
-    @AttributeOverride(name = "price", column = @Column(name = "price", nullable = false))
     private Price price;
 
     @Column(name = "stock", nullable = false)
     private int stock;
+
+    @Column(name = "delete_yn", nullable = false)
+    private boolean deleteYn;
 
     @Builder
     public Item(String name, BigDecimal price, int stock) {
@@ -54,7 +56,7 @@ public class Item {
     }
 
     public String getPriceToString() {
-        return this.price.getValue().toString();
+        return String.valueOf(this.price.getValue().intValue());
     }
 
     public void decreaseStock(int decreaseCount) {
@@ -63,5 +65,9 @@ public class Item {
         }
 
         this.stock -= decreaseCount;
+    }
+
+    public void delete() {
+        this.deleteYn = true;
     }
 }

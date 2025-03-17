@@ -29,4 +29,9 @@ public class ItemController {
     public void decreaseStock(@PathVariable Long itemId, @RequestBody ItemRequest.DecreaseStock decreaseStock) {
         itemService.decreaseStock(itemId, decreaseStock.decreaseCount());
     }
+
+    @DeleteMapping("/items/{itemId}")
+    public void deleteBy(@PathVariable Long itemId) {
+        itemService.deleteBy(itemId);
+    }
 }
