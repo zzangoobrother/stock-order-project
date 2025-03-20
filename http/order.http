@@ -1,7 +1,0 @@
-POST localhost:8081/api/v1/orders
-Content-Type: application/json
-
-{
-  "itemId" : "1",
-  "quantity" : "1"
-}
