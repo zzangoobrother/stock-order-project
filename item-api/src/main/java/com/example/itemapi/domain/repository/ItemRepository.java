@@ -9,5 +9,5 @@ public interface ItemRepository {
 
     boolean existsBy(String name);
 
-    Optional<Item> findByItemId(Long itemId);
+    Optional<Item> findByIdAndDeleteYnFalse(Long itemId);
 }

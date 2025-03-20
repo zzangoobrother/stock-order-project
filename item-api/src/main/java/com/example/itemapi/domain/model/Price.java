@@ -1,5 +1,6 @@
 package com.example.itemapi.domain.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
 public class Price {
+    @Column(name = "price", nullable = false)
     private BigDecimal value;
 
     public Price(BigDecimal value) {
