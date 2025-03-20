@@ -29,8 +29,8 @@ public class Item {
     @Column(name = "stock", nullable = false)
     private int stock;
 
-    @Column(name = "delete_yn", nullable = false)
-    private boolean deleteYn;
+    @Column(name = "is_delete", nullable = false)
+    private boolean isDelete;
 
     @Builder
     public Item(String name, BigDecimal price, int stock) {
@@ -68,6 +68,6 @@ public class Item {
     }
 
     public void delete() {
-        this.deleteYn = true;
+        this.isDelete = true;
     }
 }
