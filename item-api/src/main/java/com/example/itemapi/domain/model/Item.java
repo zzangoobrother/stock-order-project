@@ -56,4 +56,16 @@ public class Item {
     public String getPriceToString() {
         return this.price.getValue().toString();
     }
+
+    public void decreaseStock(int decreaseCount) {
+        if (decreaseCount <= 0) {
+            throw new IllegalArgumentException("재고 감소 수량은 1 이상이어야 합니다.");
+        }
+
+        if (this.stock < decreaseCount) {
+            throw new IllegalArgumentException("재고가 부족합니다.");
+        }
+
+        this.stock -= decreaseCount;
+    }
 }
