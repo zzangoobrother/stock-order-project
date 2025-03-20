@@ -1,8 +1,8 @@
 package com.example.itemapi.interfaces.presentation.request;
 
-import java.math.BigDecimal;
-
 import lombok.Builder;
+
+import java.math.BigDecimal;
 
 public record ItemRequest() {
 
@@ -13,5 +13,10 @@ public record ItemRequest() {
     ) {
         @Builder
         public AddItem {}
+    }
+
+    public record DecreaseStock(
+            int decreaseCount
+    ) {
     }
 }
