@@ -40,4 +40,12 @@ public class ItemService {
     public void decreaseStock(Long itemId, int decreaseStock) {
         itemManager.decreaseStock(itemId, decreaseStock);
     }
+
+    /**
+     * 1. 제품 삭제
+     * 2. 로컬 캐시 삭제
+     */
+    public void deleteBy(Long itemId) {
+        itemManager.deleteBy(itemId);
+    }
 }
