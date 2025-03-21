@@ -13,7 +13,7 @@ public class OrderManager {
 
     private final OrderRepository orderRepository;
 
-    public Order crateOrder(Long itemId, int quantity) {
+    public Order createOrder(Long itemId, int quantity) {
         Order order = Order.builder()
                 .itemId(itemId)
                 .quantity(quantity)

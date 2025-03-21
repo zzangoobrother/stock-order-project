@@ -30,15 +30,15 @@ public class OrderService {
      * 그런 경우는 일단 결제 api 서비스를 만들면서 고민해보자.
      */
     @Transactional
-    public void crateOrder(Long itemId, int quantity) {
+    public void createOrder(Long itemId, int quantity) {
         // 제품 재고 검증
         ItemInfoResponse itemInfoResponse = itemClient.getBy(itemId);
-        if (itemInfoResponse.stock() <= 0) {
+        if (itemInfoResponse.stock() <= quantity) {
             throw new IllegalArgumentException("해당 제품의 재고가 부족합니다.");
         }
 
         // 주문 생성
-        Order order = orderManager.crateOrder(itemId, quantity);
+        Order order = orderManager.createOrder(itemId, quantity);
 
         // 결제
         PaymentRequest paymentRequest = PaymentRequest.builder()

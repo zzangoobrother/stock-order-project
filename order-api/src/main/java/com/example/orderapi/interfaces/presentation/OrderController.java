@@ -15,7 +15,7 @@ public class OrderController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/orders")
-    public void crateOrder(@RequestBody OrderRequest reqest) {
-        orderService.crateOrder(reqest.itemId(), reqest.quantity());
+    public void createOrder(@RequestBody OrderRequest reqest) {
+        orderService.createOrder(reqest.itemId(), reqest.quantity());
     }
 }
