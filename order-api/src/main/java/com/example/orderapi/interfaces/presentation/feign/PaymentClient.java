@@ -1,5 +1,6 @@
 package com.example.orderapi.interfaces.presentation.feign;
 
+import com.example.orderapi.application.service.dto.request.PaymentCancelRequest;
 import com.example.orderapi.application.service.dto.request.PaymentRequest;
 import com.example.orderapi.application.service.dto.response.PaymentResultResponse;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -11,4 +12,7 @@ public interface PaymentClient {
 
     @PostMapping(value = "/payments", consumes = "application/json; charset=UTF-8")
     PaymentResultResponse payment(@RequestBody PaymentRequest paymentRequest);
+
+    @PostMapping(value = "/payments/cancel", consumes = "application/json; charset=UTF-8")
+    PaymentResultResponse cancel(@RequestBody PaymentCancelRequest paymentRequest);
 }
