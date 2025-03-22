@@ -1,5 +1,6 @@
 package com.example.paymentapi.interfaces.presentation;
 
+import com.example.paymentapi.interfaces.presentation.request.PaymentCancelRequest;
 import com.example.paymentapi.interfaces.presentation.request.PaymentRequest;
 import com.example.paymentapi.interfaces.presentation.response.PaymentResultResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,5 +19,11 @@ public class PaymentController {
     public PaymentResultResponse payment(@RequestBody PaymentRequest request) {
         log.info("payment type : {}, price : {}", request.paymentType(), request.price());
         return new PaymentResultResponse("200", "결제 완료");
+    }
+
+    @PostMapping("/payments/cancel")
+    public PaymentResultResponse cancel(@RequestBody PaymentCancelRequest request) {
+        log.info("payment type : {}, price : {}", request.paymentType(), request.price());
+        return new PaymentResultResponse("200", "결제 취소");
     }
 }

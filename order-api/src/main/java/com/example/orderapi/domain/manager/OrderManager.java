@@ -5,6 +5,7 @@ import com.example.orderapi.domain.model.OrderStatus;
 import com.example.orderapi.domain.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
@@ -13,6 +14,7 @@ public class OrderManager {
 
     private final OrderRepository orderRepository;
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Order createOrder(Long itemId, int quantity) {
         Order order = Order.builder()
                 .itemId(itemId)
@@ -27,5 +29,11 @@ public class OrderManager {
     public void paymentResult(Long orderId) {
         Order order = orderRepository.getBy(orderId).orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다."));
         order.paymentResult();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void failOrder(Long orderId) {
+        Order order = orderRepository.getBy(orderId).orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다."));
+        order.failOrder();
     }
 }
