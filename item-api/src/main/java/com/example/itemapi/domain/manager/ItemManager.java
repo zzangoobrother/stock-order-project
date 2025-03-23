@@ -27,6 +27,7 @@ public class ItemManager {
                 .name(name)
                 .price(price)
                 .stock(stock)
+                .isDelete(false)
                 .build();
 
         itemRepository.save(item);
@@ -40,7 +41,6 @@ public class ItemManager {
         return itemRepository.findByIdAndDeleteYnFalse(itemId).orElseThrow(() -> new IllegalArgumentException("해당 품목이 존재하지 않습니다."));
     }
 
-    @Transactional
     @CachePut(cacheNames = "itemInfo", key = "'itemInfo:' + #itemId")
     @DistributedLock(key = "'decrease:stock:' + #itemId")
     public Item decreaseStock(Long itemId, int decreaseCount) {

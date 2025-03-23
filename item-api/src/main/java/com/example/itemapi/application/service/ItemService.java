@@ -36,7 +36,6 @@ public class ItemService {
      * 1. 제품 재고 차감
      * 2. 재고가 부족하다면 예외 처리
      */
-    @Transactional
     public void decreaseStock(Long itemId, int decreaseStock) {
         itemManager.decreaseStock(itemId, decreaseStock);
     }
