@@ -39,8 +39,8 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant API
-    participant ItemService
     participant Localcache
+    participant ItemService
     participant Database
     
     User->>API: 제품 상세 조회 요청
@@ -71,8 +71,8 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant API
-    participant ItemService
     participant Localcache
+    participant ItemService
     participant Database
     
     User->>API: 제품 정보 수정 요청
@@ -104,8 +104,8 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant API
-    participant ItemService
     participant Localcache
+    participant ItemService
     participant Database
     
     User->>API: 제품 삭제 요청
@@ -113,7 +113,7 @@ sequenceDiagram
     Localcache->>ItemService: 제품 삭제 요청
     ItemService->>Database: 제품 소프트 delete 처리
     Database-->>ItemService: 제품 삭제 처리 완료
-    ItemService-->>Localcache: 제품 삭제 처리 완료
+    ItemService-->>Localcache: 제품 삭제 처리 요청
     Localcache-->>API: 제품 삭제 처리 완료 반환
     API-->>User: 제품 삭제 처리 완료 반환
 ```
