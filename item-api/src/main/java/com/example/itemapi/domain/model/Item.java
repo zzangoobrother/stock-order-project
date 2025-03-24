@@ -33,16 +33,17 @@ public class Item {
     private boolean isDelete;
 
     @Builder
-    public Item(String name, BigDecimal price, int stock) {
-        this(name, new Price(price), stock);
+    public Item(String name, BigDecimal price, int stock, boolean isDelete) {
+        this(name, new Price(price), stock, isDelete);
     }
 
-    private Item(String name, Price price, int stock) {
+    private Item(String name, Price price, int stock, boolean isDelete) {
         validated(name, stock);
 
         this.name = name;
         this.price = price;
         this.stock = stock;
+        this.isDelete = isDelete;
     }
 
     private void validated(String name, int stock) {

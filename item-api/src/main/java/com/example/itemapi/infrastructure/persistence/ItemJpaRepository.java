@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface ItemJpaRepository extends JpaRepository<Item, Long> {
     boolean existsByName(String name);
 
-    Optional<Item> findByIdAndDeleteYnFalse(Long itemId);
+    Optional<Item> findByIdAndIsDeleteFalse(Long itemId);
 }

@@ -8,5 +8,7 @@ pluginManagement {
 rootProject.name = 'stock-order-project'
 
 include(
-        "item-api"
+        "item-api",
+        "order-api",
+        "payment-api"
 )
