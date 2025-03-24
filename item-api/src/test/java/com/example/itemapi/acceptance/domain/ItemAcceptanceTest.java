@@ -87,10 +87,10 @@ public class ItemAcceptanceTest extends AcceptanceTest {
 
         int waveCount = 5;
         int concurrencyPerWave = 1_000;
-        decreaseTestWave((no) -> 재고_차감_요청(1L, 1), waveCount, concurrencyPerWave);
+        decreaseTestWave(() -> 재고_차감_요청(1L, 1), waveCount, concurrencyPerWave);
     }
 
-    private void decreaseTestWave(Consumer<Void> action, int waveCount, int concurrencyPerWave) throws InterruptedException {
+    private void decreaseTestWave(Runnable action, int waveCount, int concurrencyPerWave) throws InterruptedException {
         int stock = 제품_단건_조회_요청(1L).jsonPath().getInt("stock");
 
         ExecutorService executorService = Executors.newFixedThreadPool(32);
@@ -101,7 +101,7 @@ public class ItemAcceptanceTest extends AcceptanceTest {
             for (int i = 0; i < concurrencyPerWave; i++) {
                 executorService.submit(() -> {
                     try {
-                        action.accept(null);
+                        action.run();
                     } finally {
                         latch.countDown();
                     }

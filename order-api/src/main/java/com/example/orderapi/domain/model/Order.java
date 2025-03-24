@@ -37,8 +37,4 @@ public class Order {
     public void paymentResult() {
         this.orderStatus = OrderStatus.PAYMENT;
     }
-
-    public void failOrder() {
-        this.orderStatus = OrderStatus.PAYMENT_FAIL;
-    }
 }
