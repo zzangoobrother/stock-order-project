@@ -6,7 +6,6 @@ import lombok.Getter;
 public enum OrderStatus {
     CREATED("주문 생성"),
     PAYMENT("결제 완료"),
-    PAYMENT_FAIL("결제 실패"),
     COMPLETED("주문 완료"),
     ;
 
