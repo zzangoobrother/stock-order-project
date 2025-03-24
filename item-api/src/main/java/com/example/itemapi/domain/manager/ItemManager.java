@@ -38,14 +38,14 @@ public class ItemManager {
     @Transactional(readOnly = true)
     @Cacheable(cacheNames = "itemInfo", key = "'itemInfo:' + #itemId")
     public Item getBy(Long itemId) {
-        return itemRepository.findByIdAndDeleteYnFalse(itemId).orElseThrow(() -> new IllegalArgumentException("해당 품목이 존재하지 않습니다."));
+        return itemRepository.findByIdAndIsDeleteFalse(itemId).orElseThrow(() -> new IllegalArgumentException("해당 품목이 존재하지 않습니다."));
     }
 
     @Transactional
     @CachePut(cacheNames = "itemInfo", key = "'itemInfo:' + #itemId")
     @DistributedLock(key = "'decrease:stock:' + #itemId")
     public Item decreaseStock(Long itemId, int decreaseCount) {
-        Item item = itemRepository.findByIdAndDeleteYnFalse(itemId).orElseThrow(() -> new IllegalArgumentException("해당 품목이 존재하지 않습니다."));
+        Item item = itemRepository.findByIdAndIsDeleteFalse(itemId).orElseThrow(() -> new IllegalArgumentException("해당 품목이 존재하지 않습니다."));
         item.decreaseStock(decreaseCount);
 
         return item;
@@ -54,7 +54,7 @@ public class ItemManager {
     @Transactional
     @CacheEvict(cacheNames = "itemInfo", key = "'itemInfo:' + #itemId")
     public void deleteBy(Long itemId) {
-        Item item = itemRepository.findByIdAndDeleteYnFalse(itemId)
+        Item item = itemRepository.findByIdAndIsDeleteFalse(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 품목이 존재하지 않습니다."));
         item.delete();
     }
