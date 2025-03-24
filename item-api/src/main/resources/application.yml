@@ -15,5 +15,20 @@ spring:
       host: localhost
       port: 6379
 
+    cluster:
+      redis:
+        host1: localhost
+        port1: 7001
+        host2: localhost
+        port2: 7002
+        host3: localhost
+        port3: 7003
+        host4: localhost
+        port4: 7004
+        host5: localhost
+        port5: 7005
+        host6: localhost
+        port6: 7006
+
 server:
   shutdown: graceful
