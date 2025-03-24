@@ -26,7 +26,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
-    public Optional<Item> findByIdAndDeleteYnFalse(Long itemId) {
-        return repository.findByIdAndDeleteYnFalse(itemId);
+    public Optional<Item> findByIdAndIsDeleteFalse(Long itemId) {
+        return repository.findByIdAndIsDeleteFalse(itemId);
     }
 }
