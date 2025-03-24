@@ -9,11 +9,12 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 
-@Primary
+@Order(Integer.MIN_VALUE)
 @Aspect
 @Component
 @Slf4j
