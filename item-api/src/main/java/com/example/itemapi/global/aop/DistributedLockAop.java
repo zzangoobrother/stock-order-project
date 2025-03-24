@@ -8,10 +8,12 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 
+@Primary
 @Aspect
 @Component
 @Slf4j
@@ -19,11 +21,9 @@ public class DistributedLockAop {
     private static final String REDISSON_LOCK_PREFIX = "LOCK:";
 
     private final RedissonClient redissonClient;
-    private final AopForTransaction aopForTransaction;
 
-    public DistributedLockAop(RedissonClient redissonClient, AopForTransaction aopForTransaction) {
+    public DistributedLockAop(RedissonClient redissonClient) {
         this.redissonClient = redissonClient;
-        this.aopForTransaction = aopForTransaction;
     }
 
     @Around("@annotation(com.example.itemapi.global.annotaion.DistributedLock)")
@@ -41,7 +41,7 @@ public class DistributedLockAop {
                 return false;
             }
 
-            return aopForTransaction.proceed(joinPoint);
+            return joinPoint.proceed();
         } catch (InterruptedException e) {
             throw new InterruptedException();
         } finally {
