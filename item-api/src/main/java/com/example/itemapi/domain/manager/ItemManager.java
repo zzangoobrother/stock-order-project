@@ -27,6 +27,7 @@ public class ItemManager {
                 .name(name)
                 .price(price)
                 .stock(stock)
+                .isDelete(false)
                 .build();
 
         itemRepository.save(item);
