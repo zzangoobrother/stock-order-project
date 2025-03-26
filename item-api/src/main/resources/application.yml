@@ -10,11 +10,10 @@ spring:
       ddl-auto: create
     show-sql: true
 
-  data:
-    redis:
-      host: localhost
-      port: 6379
+  kafka:
+    bootstrap-servers: localhost:10000,localhost:10001,localhost:10002
 
+  data:
     cluster:
       redis:
         host1: localhost

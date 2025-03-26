@@ -1,15 +1,18 @@
 package com.example.orderapi.application.service;
 
-import com.example.orderapi.application.service.dto.request.DecreaseStockRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.example.kafka.DecreaseStockEvent;
 import com.example.orderapi.application.service.dto.request.PaymentRequest;
 import com.example.orderapi.application.service.dto.response.ItemInfoResponse;
 import com.example.orderapi.domain.manager.OrderManager;
 import com.example.orderapi.domain.model.Order;
 import com.example.orderapi.interfaces.presentation.feign.ItemClient;
 import com.example.orderapi.interfaces.presentation.feign.PaymentClient;
+import com.example.orderapi.kafka.OrderEventProducer;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -18,6 +21,7 @@ public class OrderService {
     private final OrderManager orderManager;
     private final ItemClient itemClient;
     private final PaymentClient paymentClient;
+    private final OrderEventProducer orderEventProducer;
 
     /**
      * 주문 생각해보기
@@ -58,6 +62,6 @@ public class OrderService {
         orderManager.paymentResult(order.getId());
 
         // 재고 차감
-        itemClient.decreaseStock(itemId, new DecreaseStockRequest(quantity));
+        orderEventProducer.sendResultEvent(new DecreaseStockEvent(itemId, quantity));
     }
 }
