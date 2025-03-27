@@ -5,6 +5,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import com.example.itemapi.application.service.ItemService;
+import com.example.itemapi.global.config.TopicNames;
 import com.example.kafka.DecreaseStockEvent;
 import com.example.kafka.Event;
 
@@ -18,7 +19,7 @@ public class ItemResultConsumer {
 
 	private final ItemService itemService;
 
-	@KafkaListener(topics = "item-decrease-stock-result", groupId = "item-group")
+	@KafkaListener(topics = TopicNames.ITEM_DECREASE_STOCK_TOPIC, groupId = "item-group")
 	public void onCommandEvent(ConsumerRecord<String, Event> record) {
 		log.info("Publish command event: {}", record.value());
 		Object event = record.value().getEvent();

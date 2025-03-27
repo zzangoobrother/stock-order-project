@@ -21,8 +21,10 @@ import io.confluent.kafka.serializers.KafkaAvroSerializer;
 @EnableKafka
 @Configuration
 public class KafkaConfig {
-
 	private static final String BOOTSTRAP_SERVER = "localhost:10000";
+
+	private static final String SCHEMA_REGISTRY_URL_CONFIG = "schema.registry.url";
+	private static final String SCHEMA_REGISTRY_URL = "http://localhost:9001";
 
 	@Bean
 	public ProducerFactory<String, Event> producerFactory() {
@@ -30,7 +32,7 @@ public class KafkaConfig {
 		config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER);
 		config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 		config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
-		config.put("schema.registry.url", "http://localhost:9001");
+		config.put(SCHEMA_REGISTRY_URL_CONFIG, SCHEMA_REGISTRY_URL);
 
 		return new DefaultKafkaProducerFactory<>(config);
 	}
@@ -43,7 +45,7 @@ public class KafkaConfig {
 	@Bean
 	public List<NewTopic> topics() {
 		return List.of(
-			new NewTopic("item-decrease-stock-result", 1, (short)1)
+			new NewTopic(TopicNames.ITEM_DECREASE_STOCK_TOPIC, 1, (short)1)
 		);
 	}
 }
