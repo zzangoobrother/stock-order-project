@@ -1,4 +1,4 @@
-package com.example.itemapi.global.config;
+package com.example.orderapi.global.config;
 
 import com.example.kafka.Event;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 @EnableKafka
 @Configuration
-public class KafkaConfig {
+public class KafkaConsumerConfig {
 
 	private static final String BOOTSTRAP_SERVER = "localhost:10000";
 
