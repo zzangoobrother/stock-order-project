@@ -37,4 +37,8 @@ public class Order {
     public void paymentResult() {
         this.orderStatus = OrderStatus.PAYMENT;
     }
+
+    public void complete() {
+        this.orderStatus = OrderStatus.COMPLETED;
+    }
 }

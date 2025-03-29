@@ -26,7 +26,7 @@ public class ItemResultConsumer {
 
 		if (event instanceof DecreaseStockEvent) {
 			DecreaseStockEvent decreaseStockEvent = (DecreaseStockEvent)event;
-			itemService.decreaseStock(decreaseStockEvent.getItemId(), decreaseStockEvent.getDecreaseCount());
+			itemService.decreaseStock(decreaseStockEvent.getOrderId(), decreaseStockEvent.getItemId(), decreaseStockEvent.getDecreaseCount());
 		}
 	}
 }

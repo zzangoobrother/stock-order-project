@@ -1,8 +1,5 @@
 package com.example.orderapi.application.service;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.example.kafka.DecreaseStockEvent;
 import com.example.orderapi.application.service.dto.request.PaymentRequest;
 import com.example.orderapi.application.service.dto.response.ItemInfoResponse;
@@ -11,8 +8,9 @@ import com.example.orderapi.domain.model.Order;
 import com.example.orderapi.interfaces.presentation.feign.ItemClient;
 import com.example.orderapi.interfaces.presentation.feign.PaymentClient;
 import com.example.orderapi.kafka.OrderEventProducer;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -51,6 +49,8 @@ public class OrderService {
                     .price("10000")
                     .build();
             paymentClient.payment(paymentRequest);
+
+            order.paymentResult();
         } catch (RuntimeException e) {
             // 결제 실패
             // 로그를 남겨 따로 관리
@@ -58,10 +58,12 @@ public class OrderService {
             throw new IllegalStateException("결제에 실패했습니다. 다시 시도해 주세요.");
         }
 
-        // 주문 결제 완료 상태 변경
-        orderManager.paymentResult(order.getId());
-
         // 재고 차감
-        orderEventProducer.sendResultEvent(new DecreaseStockEvent(itemId, quantity));
+        orderEventProducer.sendResultEvent(new DecreaseStockEvent(order.getId(), itemId, quantity));
+    }
+
+    @Transactional
+    public void orderComplete(Long orderId) {
+        orderManager.orderComplete(orderId);
     }
 }

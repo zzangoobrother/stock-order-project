@@ -1,0 +1,8 @@
+{
+  "type": "record",
+  "name": "OrderCompleteEvent",
+  "namespace": "com.example.kafka",
+  "fields": [
+    { "name": "orderId", "type": "long" }
+  ]
+}
