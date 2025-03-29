@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,13 +37,19 @@ public class ItemManager {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(cacheNames = "itemInfo", key = "'itemInfo:' + #itemId")
+    @Caching(cacheable = {
+            @Cacheable(cacheManager = "localCacheManager", cacheNames = "itemInfo", key = "'itemInfo:' + #itemId"),
+            @Cacheable(cacheManager = "redisCacheManger", cacheNames = "itemInfo", key = "'itemInfo:' + #itemId")
+    })
     public Item getBy(Long itemId) {
         return itemRepository.findByIdAndIsDeleteFalse(itemId).orElseThrow(() -> new IllegalArgumentException("해당 품목이 존재하지 않습니다."));
     }
 
     @Transactional
-    @CachePut(cacheNames = "itemInfo", key = "'itemInfo:' + #itemId")
+    @Caching(put = {
+            @CachePut(cacheManager = "localCacheManager", cacheNames = "itemInfo", key = "'itemInfo:' + #itemId"),
+            @CachePut(cacheManager = "redisCacheManger", cacheNames = "itemInfo", key = "'itemInfo:' + #itemId")
+    })
     @DistributedLock(key = "'decrease:stock:' + #itemId")
     public Item decreaseStock(Long itemId, int decreaseCount) {
         Item item = itemRepository.findByIdAndIsDeleteFalse(itemId).orElseThrow(() -> new IllegalArgumentException("해당 품목이 존재하지 않습니다."));
@@ -52,7 +59,10 @@ public class ItemManager {
     }
 
     @Transactional
-    @CacheEvict(cacheNames = "itemInfo", key = "'itemInfo:' + #itemId")
+    @Caching(evict = {
+            @CacheEvict(cacheManager = "localCacheManager", cacheNames = "itemInfo", key = "'itemInfo:' + #itemId"),
+            @CacheEvict(cacheManager = "redisCacheManger", cacheNames = "itemInfo", key = "'itemInfo:' + #itemId")
+    })
     public void deleteBy(Long itemId) {
         Item item = itemRepository.findByIdAndIsDeleteFalse(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 품목이 존재하지 않습니다."));
