@@ -8,5 +8,5 @@ public interface OrderRepository {
 
     Order save(Order order);
 
-    Optional<Order> getBy(Long orderId);
+    Optional<Order> findBy(Long orderId);
 }

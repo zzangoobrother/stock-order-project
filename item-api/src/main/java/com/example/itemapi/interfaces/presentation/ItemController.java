@@ -28,12 +28,6 @@ public class ItemController {
         return ResponseEntity.ok().body(itemInfoResponse);
     }
 
-    @PostMapping("/items/{itemId}/decrease-stock")
-    public ResponseEntity<Void> decreaseStock(@PathVariable Long itemId, @RequestBody ItemRequest.DecreaseStock decreaseStock) {
-        itemService.decreaseStock(itemId, decreaseStock.decreaseCount());
-        return ResponseEntity.ok().build();
-    }
-
     @DeleteMapping("/items/{itemId}")
     public ResponseEntity<Void> deleteBy(@PathVariable Long itemId) {
         itemService.deleteBy(itemId);
