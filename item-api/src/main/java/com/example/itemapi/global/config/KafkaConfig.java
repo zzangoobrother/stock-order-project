@@ -1,8 +1,7 @@
 package com.example.itemapi.global.config;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.example.kafka.Event;
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -12,9 +11,8 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 
-import com.example.kafka.Event;
-
-import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import java.util.HashMap;
+import java.util.Map;
 
 @EnableKafka
 @Configuration
