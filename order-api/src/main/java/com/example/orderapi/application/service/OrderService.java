@@ -1,10 +1,12 @@
 package com.example.orderapi.application.service;
 
 import com.example.kafka.DecreaseStockEvent;
+import com.example.kafka.OrderPaymentCompleteEvent;
 import com.example.orderapi.application.service.dto.request.PaymentRequest;
 import com.example.orderapi.application.service.dto.response.ItemInfoResponse;
 import com.example.orderapi.domain.manager.OrderManager;
 import com.example.orderapi.domain.model.Order;
+import com.example.orderapi.global.config.TopicNames;
 import com.example.orderapi.interfaces.presentation.feign.ItemClient;
 import com.example.orderapi.interfaces.presentation.feign.PaymentClient;
 import com.example.orderapi.kafka.OrderEventProducer;
@@ -49,8 +51,6 @@ public class OrderService {
                     .price("10000")
                     .build();
             paymentClient.payment(paymentRequest);
-
-            order.paymentResult();
         } catch (RuntimeException e) {
             // 결제 실패
             // 로그를 남겨 따로 관리
@@ -58,12 +58,20 @@ public class OrderService {
             throw new IllegalStateException("결제에 실패했습니다. 다시 시도해 주세요.");
         }
 
-        // 재고 차감
-        orderEventProducer.sendResultEvent(new DecreaseStockEvent(order.getId(), itemId, quantity));
+        // 결제 완료
+        orderEventProducer.sendEvent(TopicNames.ORDER_RESULT_TOPIC, new OrderPaymentCompleteEvent(order.getId(), itemId, quantity));
     }
 
     @Transactional
     public void orderComplete(Long orderId) {
         orderManager.orderComplete(orderId);
+    }
+
+    @Transactional
+    public void paymentComplete(Long orderId, Long itemId, int decreaseCount) {
+        orderManager.paymentComplete(orderId);
+
+        // 재고 차감
+        orderEventProducer.sendEvent(TopicNames.ITEM_DECREASE_STOCK_TOPIC, new DecreaseStockEvent(orderId, itemId, decreaseCount));
     }
 }

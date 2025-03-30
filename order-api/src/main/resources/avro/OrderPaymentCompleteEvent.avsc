@@ -1,0 +1,10 @@
+{
+  "type": "record",
+  "name": "OrderPaymentCompleteEvent",
+  "namespace": "com.example.kafka",
+  "fields": [
+    { "name": "orderId", "type": "long" },
+    { "name": "itemId", "type": "long" },
+    { "name": "decreaseCount", "type": "int" }
+  ]
+}
