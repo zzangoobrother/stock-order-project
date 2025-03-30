@@ -1,9 +1,9 @@
 package com.example.orderapi.application.service;
 
 import com.example.kafka.DecreaseStockEvent;
-import com.example.kafka.OrderPaymentCompleteEvent;
 import com.example.orderapi.application.service.dto.request.PaymentRequest;
 import com.example.orderapi.application.service.dto.response.ItemInfoResponse;
+import com.example.orderapi.application.service.listener.dto.OrderPaymentCompleteEvent;
 import com.example.orderapi.domain.manager.OrderManager;
 import com.example.orderapi.domain.model.Order;
 import com.example.orderapi.global.config.TopicNames;
@@ -11,6 +11,7 @@ import com.example.orderapi.interfaces.presentation.feign.ItemClient;
 import com.example.orderapi.interfaces.presentation.feign.PaymentClient;
 import com.example.orderapi.kafka.OrderEventProducer;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ public class OrderService {
     private final ItemClient itemClient;
     private final PaymentClient paymentClient;
     private final OrderEventProducer orderEventProducer;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * 주문 생각해보기
@@ -59,7 +61,7 @@ public class OrderService {
         }
 
         // 결제 완료
-        orderEventProducer.sendEvent(TopicNames.ORDER_RESULT_TOPIC, new OrderPaymentCompleteEvent(order.getId(), itemId, quantity));
+        applicationEventPublisher.publishEvent(new OrderPaymentCompleteEvent(order.getId(), itemId, quantity));
     }
 
     @Transactional

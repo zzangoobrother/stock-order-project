@@ -8,8 +8,7 @@
       "name": "event",
       "type": [
         "DecreaseStockEvent",
-        "OrderCompleteEvent",
-        "OrderPaymentCompleteEvent"
+        "OrderCompleteEvent"
       ]
     }
   ]
