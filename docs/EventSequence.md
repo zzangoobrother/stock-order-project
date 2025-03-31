@@ -40,21 +40,30 @@ sequenceDiagram
     participant User
     participant API
     participant Localcache
+    participant Redis
     participant ItemService
     participant Database
     
     User->>API: 제품 상세 조회 요청
+    API->>Localcache: 제품 상세 정보 조회
     alt Localcache 존재
-        API->>Localcache: 제품 상세 정보 조회
         Localcache-->>API: 제품 상세 정보
-        API-->>User: 제품 상세 정보 반환
+        API-->>User: 제품 상세 정보 반환            
     else Localcache 미존재
-        API->>ItemService: 제품 상세 조회 요청
-        ItemService->>Database: 제품 상세 정보 조회
-        Database-->>ItemService: 제품 상세 정보
-        ItemService-->>Localcache: 제품 상세 정보 저장
-        Localcache-->>API: 제품 상세 정보
-        API-->>User: 제품 상세 정보 반환
+        Localcache->>Redis: 제품 상세 정보 조회
+        alt Redis 존재
+            Redis->>Localcache: 제품 상세 정보 저장
+            Localcache-->>API: 제품 상세 정보
+            API-->>User: 제품 상세 정보 반환
+        else Redis 미존재
+            Redis->>ItemService: 제품 상세 조회 요청
+            ItemService->>Database: 제품 상세 정보 조회
+            Database-->>ItemService: 제품 상세 정보
+            ItemService-->>Redis: 제품 상세 정보 저장
+            Redis-->>Localcache: 제품 상세 정보 저장
+            Localcache-->>API: 제품 상세 정보
+            API-->>User: 제품 상세 정보 반환
+        end
     end
 ```
 
@@ -72,6 +81,7 @@ sequenceDiagram
     participant User
     participant API
     participant Localcache
+    participant Redis
     participant ItemService
     participant Database
     
@@ -80,15 +90,29 @@ sequenceDiagram
     Localcache->>ItemService: 제품 정보 수정 요청
     ItemService->>Database: 제품 정보 수정
     Database-->>ItemService: 수정된 제품 정보
-    alt Localcache Key 존재
-        ItemService-->>Localcache: 수정된 제품 정보 cache에 업데이트
-        Localcache-->>API: 제품 정보 수정
-        API-->>User: 수정된 제품 정보 반환
-    else Localcache Key 미존재
-        ItemService-->>Localcache: 수정된 제품 정보 cache에 저장
-        Localcache-->>API: 제품 정보 수정
-        API-->>User: 수정된 제품 정보 반환
-    end 
+    alt Redis key 존재
+        ItemService-->>Redis: 수정된 제품 정보 cache에 업데이트
+        alt Localcache Key 존재
+            ItemService-->>Localcache: 수정된 제품 정보 cache에 업데이트
+            Localcache-->>API: 제품 정보 수정 반환
+            API-->>User: 수정된 제품 정보 반환
+        else Localcache Key 미존재
+            ItemService-->>Localcache: 수정된 제품 정보 cache에 저장
+            Localcache-->>API: 제품 정보 수정
+            API-->>User: 수정된 제품 정보 반환
+        end
+    else Redis key 미존재
+        ItemService-->>Redis: 수정된 제품 정보 cache에 저장
+        alt Localcache Key 존재
+            ItemService-->>Localcache: 수정된 제품 정보 cache에 업데이트
+            Localcache-->>API: 제품 정보 수정 반환
+            API-->>User: 수정된 제품 정보 반환
+        else Localcache Key 미존재
+            ItemService-->>Localcache: 수정된 제품 정보 cache에 저장
+            Localcache-->>API: 제품 정보 수정
+            API-->>User: 수정된 제품 정보 반환
+        end
+    end
 ```
 
 ### Description
@@ -105,12 +129,14 @@ sequenceDiagram
     participant User
     participant API
     participant Localcache
+    participant Redis
     participant ItemService
     participant Database
     
     User->>API: 제품 삭제 요청
     API->>Localcache: 제품 정보 cache 삭제
-    Localcache->>ItemService: 제품 삭제 요청
+    Localcache->>Redis: 제품 정보 cache 삭제
+    Redis->>ItemService: 제품 삭제 요청
     ItemService->>Database: 제품 소프트 delete 처리
     Database-->>ItemService: 제품 삭제 처리 완료
     ItemService-->>Localcache: 제품 삭제 처리 요청
@@ -121,5 +147,43 @@ sequenceDiagram
 ### Description
 
 제품을 삭제합니다.
+
+<br>
+
+## 4. 주문하기
+
+### 이벤트 시퀀스 다이어그램
+```mermaid
+sequenceDiagram
+    participant User
+    participant API
+    participant OrderService
+    participant ItemService
+    participant PaymentService
+    participant Database
+    
+    User->>API: 주문 요청
+    API->>OrderService: 주문 처리 요청
+    OrderService->>ItemService: 제품 재고 확인
+    ItemService-->>OrderService: 재고 확인 결과
+    alt 재고 충분함
+        OrderService->>PaymentService: 결제하기
+        PaymentService-->>OrderService: 결제 성공 및 결제 내역 반환
+        OrderService-->>API: 주문 완료 반환
+        API-->>User: 주문 완료 반환
+        OrderService->>OrderService: 주문 결제 완료 상태 변경
+        OrderService->>ItemService: 재고 차감 요청
+        ItemService->>OrderService: 주문 완료 상태 변경 요청
+    else 재고 부족함
+        OrderService-->>API: 재고 부족 오류 메시지 반환
+        API-->>User: 오류 메시지 반환
+    end
+```
+
+### Description
+
+주문 하기를 합니다.
+결제를 진행합니다.
+결제에 성공하면 주문 상태를 결제 완료 상태로 변경합니다.
 
 <br>
