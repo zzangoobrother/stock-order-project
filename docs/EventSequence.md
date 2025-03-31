@@ -52,7 +52,7 @@ sequenceDiagram
     else Localcache 미존재
         Localcache->>Redis: 제품 상세 정보 조회
         alt Redis 존재
-            Redis->>Localcache: 제품 상세 정보 저장
+            Redis-->>Localcache: 제품 상세 정보 저장
             Localcache-->>API: 제품 상세 정보
             API-->>User: 제품 상세 정보 반환
         else Redis 미존재
@@ -93,22 +93,22 @@ sequenceDiagram
     alt Redis key 존재
         ItemService-->>Redis: 수정된 제품 정보 cache에 업데이트
         alt Localcache Key 존재
-            ItemService-->>Localcache: 수정된 제품 정보 cache에 업데이트
+            Redis-->>Localcache: 수정된 제품 정보 cache에 업데이트
             Localcache-->>API: 제품 정보 수정 반환
             API-->>User: 수정된 제품 정보 반환
         else Localcache Key 미존재
-            ItemService-->>Localcache: 수정된 제품 정보 cache에 저장
+            Redis-->>Localcache: 수정된 제품 정보 cache에 저장
             Localcache-->>API: 제품 정보 수정
             API-->>User: 수정된 제품 정보 반환
         end
     else Redis key 미존재
         ItemService-->>Redis: 수정된 제품 정보 cache에 저장
         alt Localcache Key 존재
-            ItemService-->>Localcache: 수정된 제품 정보 cache에 업데이트
+            Redis-->>Localcache: 수정된 제품 정보 cache에 업데이트
             Localcache-->>API: 제품 정보 수정 반환
             API-->>User: 수정된 제품 정보 반환
         else Localcache Key 미존재
-            ItemService-->>Localcache: 수정된 제품 정보 cache에 저장
+            Redis-->>Localcache: 수정된 제품 정보 cache에 저장
             Localcache-->>API: 제품 정보 수정
             API-->>User: 수정된 제품 정보 반환
         end
@@ -139,7 +139,8 @@ sequenceDiagram
     Redis->>ItemService: 제품 삭제 요청
     ItemService->>Database: 제품 소프트 delete 처리
     Database-->>ItemService: 제품 삭제 처리 완료
-    ItemService-->>Localcache: 제품 삭제 처리 요청
+    ItemService-->>Redis: 제품 삭제 처리 요청
+    Redis-->>Localcache: 제품 삭제 처리 요청
     Localcache-->>API: 제품 삭제 처리 완료 반환
     API-->>User: 제품 삭제 처리 완료 반환
 ```
@@ -165,14 +166,22 @@ sequenceDiagram
     User->>API: 주문 요청
     API->>OrderService: 주문 처리 요청
     OrderService->>ItemService: 제품 재고 확인
+    ItemService->>Database: 제품 재고 조회
+    Database-->>ItemService: 제품 재고 반환
     ItemService-->>OrderService: 재고 확인 결과
     alt 재고 충분함
+        OrderService->>Database: 주문 생성
+        Database-->>OrderService: 주문 생성 완료
         OrderService->>PaymentService: 결제하기
+        PaymentService->>Database: 결제 생성
+        Database-->>PaymentService: 결제 생성 완료
         PaymentService-->>OrderService: 결제 성공 및 결제 내역 반환
         OrderService-->>API: 주문 완료 반환
         API-->>User: 주문 완료 반환
         OrderService->>OrderService: 주문 결제 완료 상태 변경
         OrderService->>ItemService: 재고 차감 요청
+        ItemService->>Database: 제품 재고 차감
+        Database-->>ItemService: 제품 재고 차감 완료
         ItemService->>OrderService: 주문 완료 상태 변경 요청
     else 재고 부족함
         OrderService-->>API: 재고 부족 오류 메시지 반환
