@@ -2,6 +2,7 @@ package com.example.itemapi.global.config;
 
 import com.example.kafka.Event;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -10,10 +11,13 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.DefaultErrorHandler;
+import org.springframework.util.backoff.FixedBackOff;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @EnableKafka
 @Configuration
 public class KafkaConsumerConfig {
@@ -39,7 +43,14 @@ public class KafkaConsumerConfig {
 	public ConcurrentKafkaListenerContainerFactory<String, Event> kafkaListenerContainerFactory() {
 		ConcurrentKafkaListenerContainerFactory<String, Event> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory());
+		factory.setCommonErrorHandler(errorHandler());
 
 		return factory;
+	}
+
+	private DefaultErrorHandler errorHandler() {
+		return new DefaultErrorHandler((record, e) -> {
+			log.error("record : {}, exception : {}", record, e.getCause());
+		}, new FixedBackOff(1000L, 3L));
 	}
 }
