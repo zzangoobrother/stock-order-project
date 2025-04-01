@@ -3,9 +3,11 @@ package com.example.itemapi.application.service;
 import com.example.itemapi.application.service.dto.ItemServiceDto;
 import com.example.itemapi.domain.manager.ItemManager;
 import com.example.itemapi.domain.model.Item;
+import com.example.itemapi.global.config.TopicNames;
+import com.example.itemapi.kafka.OrderEventProducer;
+import com.example.kafka.OrderCompleteEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -14,6 +16,7 @@ import java.math.BigDecimal;
 public class ItemService {
 
     private final ItemManager itemManager;
+    private final OrderEventProducer orderEventProducer;
 
     /**
      * - 제품을 추가한다.
@@ -36,8 +39,10 @@ public class ItemService {
      * 1. 제품 재고 차감
      * 2. 재고가 부족하다면 예외 처리
      */
-    public void decreaseStock(Long itemId, int decreaseStock) {
+    public void decreaseStock(Long orderId, Long itemId, int decreaseStock) {
         itemManager.decreaseStock(itemId, decreaseStock);
+
+        orderEventProducer.sendResultEvent(TopicNames.ORDER_COMPLETE_TOPIC, new OrderCompleteEvent(orderId));
     }
 
     /**

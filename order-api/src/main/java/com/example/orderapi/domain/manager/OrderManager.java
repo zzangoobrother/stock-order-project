@@ -1,13 +1,11 @@
 package com.example.orderapi.domain.manager;
 
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.example.orderapi.domain.model.Order;
 import com.example.orderapi.domain.model.OrderStatus;
 import com.example.orderapi.domain.repository.OrderRepository;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Component
@@ -28,7 +26,12 @@ public class OrderManager {
 
     @Transactional
     public void paymentResult(Long orderId) {
-        Order order = orderRepository.getBy(orderId).orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다."));
+        Order order = orderRepository.findBy(orderId).orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다."));
         order.paymentResult();
+    }
+
+    public void orderComplete(Long orderId) {
+        Order order = orderRepository.findBy(orderId).orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다."));
+        order.complete();
     }
 }
