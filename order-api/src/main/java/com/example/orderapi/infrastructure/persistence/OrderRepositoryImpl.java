@@ -19,7 +19,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Optional<Order> getBy(Long orderId) {
+    public Optional<Order> findBy(Long orderId) {
         return repository.findById(orderId);
     }
 }

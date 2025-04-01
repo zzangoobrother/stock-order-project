@@ -20,7 +20,7 @@ import io.confluent.kafka.serializers.KafkaAvroSerializer;
 
 @EnableKafka
 @Configuration
-public class KafkaConfig {
+public class KafkaProducerConfig {
 	private static final String BOOTSTRAP_SERVER = "localhost:10000";
 
 	private static final String SCHEMA_REGISTRY_URL_CONFIG = "schema.registry.url";
