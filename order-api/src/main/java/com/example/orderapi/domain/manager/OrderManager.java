@@ -24,8 +24,7 @@ public class OrderManager {
         return orderRepository.save(order);
     }
 
-    @Transactional
-    public void paymentResult(Long orderId) {
+    public void paymentComplete(Long orderId) {
         Order order = orderRepository.findBy(orderId).orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다."));
         order.paymentResult();
     }
