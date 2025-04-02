@@ -42,7 +42,7 @@ public class ItemService {
     public void decreaseStock(Long orderId, Long itemId, int decreaseStock) {
         itemManager.decreaseStock(itemId, decreaseStock);
 
-        orderEventProducer.sendResultEvent(TopicNames.ORDER_COMPLETE_TOPIC, new OrderCompleteEvent(orderId));
+        orderEventProducer.sendResultEvent(TopicNames.ORDER_RESULT_TOPIC, new OrderCompleteEvent(orderId));
     }
 
     /**

@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -30,8 +30,6 @@ import java.util.List;
 @Configuration
 @EnableCaching
 public class CacheConfig {
-
-    private final RedisConnectionFactory redisConnectionFactory;
 
     @Primary
     @Bean("localCacheManager")
@@ -52,7 +50,7 @@ public class CacheConfig {
     }
 
     @Bean("redisCacheManger")
-    public CacheManager redisCacheManager() {
+    public CacheManager redisCacheManager(LettuceConnectionFactory lettuceConnectionFactory) {
         PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
                 .allowIfSubType(Object.class)
                 .build();
@@ -68,7 +66,7 @@ public class CacheConfig {
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer(mapper)));
 
         return RedisCacheManager.RedisCacheManagerBuilder
-                .fromConnectionFactory(redisConnectionFactory)
+                .fromConnectionFactory(lettuceConnectionFactory)
                 .cacheDefaults(redisCacheConfiguration)
                 .build();
     }

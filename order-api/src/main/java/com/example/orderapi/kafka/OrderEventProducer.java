@@ -1,13 +1,10 @@
 package com.example.orderapi.kafka;
 
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Component;
-
 import com.example.kafka.Event;
-import com.example.orderapi.global.config.TopicNames;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -16,7 +13,7 @@ public class OrderEventProducer {
 
 	private final KafkaTemplate<String, Event> kafkaTemplate;
 
-	public void sendResultEvent(Object event) {
-		kafkaTemplate.send(TopicNames.ITEM_DECREASE_STOCK_TOPIC, new Event(event.getClass().getName(), event));
+	public void sendEvent(String topicName, Object event) {
+		kafkaTemplate.send(topicName, new Event(event.getClass().getName(), event));
 	}
 }

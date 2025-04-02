@@ -1,9 +1,7 @@
 package com.example.orderapi.global.config;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.example.kafka.Event;
+import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -14,9 +12,9 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 
-import com.example.kafka.Event;
-
-import io.confluent.kafka.serializers.KafkaAvroSerializer;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @EnableKafka
 @Configuration
@@ -45,7 +43,7 @@ public class KafkaProducerConfig {
 	@Bean
 	public List<NewTopic> topics() {
 		return List.of(
-			new NewTopic(TopicNames.ITEM_DECREASE_STOCK_TOPIC, 1, (short)1)
+			new NewTopic(TopicNames.ORDER_RESULT_TOPIC, 1, (short)1)
 		);
 	}
 }
