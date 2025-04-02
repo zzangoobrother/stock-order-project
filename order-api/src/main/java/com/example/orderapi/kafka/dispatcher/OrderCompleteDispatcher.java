@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-public class OrderCompleteDispatcher implements OrderDispatcher {
+public class OrderCompleteDispatcher implements OrderDispatcher<OrderCompleteEvent> {
 
     private final OrderService orderService;
 
@@ -17,8 +17,7 @@ public class OrderCompleteDispatcher implements OrderDispatcher {
     }
 
     @Override
-    public void execute(Object event) {
-        OrderCompleteEvent orderCompleteEvent = (OrderCompleteEvent) event;
+    public void execute(OrderCompleteEvent event) {
         orderService.orderComplete(orderCompleteEvent.getOrderId());
     }
 }
