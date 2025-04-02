@@ -18,6 +18,6 @@ public class OrderCompleteDispatcher implements OrderDispatcher<OrderCompleteEve
 
     @Override
     public void execute(OrderCompleteEvent event) {
-        orderService.orderComplete(orderCompleteEvent.getOrderId());
+        orderService.orderComplete(event.getOrderId());
     }
 }
