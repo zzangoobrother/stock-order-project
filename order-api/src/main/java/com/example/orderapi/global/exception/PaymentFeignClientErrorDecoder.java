@@ -9,8 +9,8 @@ public class PaymentFeignClientErrorDecoder implements ErrorDecoder {
 
     @Override
     public Exception decode(String s, Response response) {
-        if (500 == response.status()) {
-            return new RetryableException(500, response.reason(), response.request().httpMethod(), (Long) null, response.request());
+        if (HttpStatus.valueOf(response.status()).is5xxServerError()) {
+            return new RetryableException(response.status(), response.reason(), response.request().httpMethod(), (Long) null, response.request());
         }
 
         return decoder.decode(s, response);
