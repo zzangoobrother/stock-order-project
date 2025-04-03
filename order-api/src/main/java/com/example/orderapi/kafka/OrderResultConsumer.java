@@ -18,17 +18,23 @@ public class OrderResultConsumer {
 
 	private final List<OrderDispatcher> orderDispatchers;
 
-	@KafkaListener(topics = TopicNames.ORDER_RESULT_TOPIC, groupId = "order-group")
+	@KafkaListener(topics = TopicNames.ORDER_RESULT_TOPIC, groupId = "order-group", containerFactory = "kafkaListenerContainerFactory")
 	public void onCommandEvent(ConsumerRecord<String, Event> record) {
-		log.info("Publish command event: {}", record.value());
-		Object event = record.value().getEvent();
+		Event event = record.value();
+		log.info("Publish command event: {}", event);
 
 		orderDispatchers.stream()
-				.filter(it -> it.supports(event))
+				.filter(it -> it.supports(event.getEventType()))
 				.findFirst()
 				.ifPresentOrElse(
-						it -> it.execute(event),
+						it -> it.execute(event.getEvent()),
 						() -> log.warn("해당 이벤트를 처리할 수 없습니다.")
 				);
+	}
+
+	@KafkaListener(topics = TopicNames.ORDER_DLT_TOPIC, groupId = "order-group", containerFactory = "kafkaListenerContainerFactory")
+	public void onCommandEvent2(ConsumerRecord<String, Event> record) {
+		Event event = record.value();
+		log.info("DLT Publish command event: {}", event);
 	}
 }
