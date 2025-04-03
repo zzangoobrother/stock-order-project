@@ -1,5 +1,7 @@
 package com.example.orderapi.global.exception;
 
+import org.springframework.http.HttpStatus;
+
 import feign.Response;
 import feign.RetryableException;
 import feign.codec.ErrorDecoder;
