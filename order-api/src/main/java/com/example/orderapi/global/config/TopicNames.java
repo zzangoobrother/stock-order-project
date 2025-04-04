@@ -6,5 +6,5 @@ public class TopicNames {
 
 	public static final String ORDER_RESULT_TOPIC = "order-result";
 
-	public static final String ORDER_DLT_TOPIC = "order-dlt.DLT";
+	public static final String ORDER_DLT_TOPIC = "order-result-dlt";
 }

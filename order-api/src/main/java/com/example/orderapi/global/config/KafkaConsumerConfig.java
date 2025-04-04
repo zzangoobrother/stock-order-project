@@ -1,9 +1,8 @@
 package com.example.orderapi.global.config;
 
-import com.example.kafka.Event;
-import io.confluent.kafka.serializers.KafkaAvroDeserializer;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -18,8 +17,11 @@ import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.util.backoff.FixedBackOff;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.example.kafka.Event;
+
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -57,10 +59,6 @@ public class KafkaConsumerConfig {
 
 	@Bean
 	public CommonErrorHandler errorHandler() {
-//		return new DefaultErrorHandler((record, e) -> {
-//			log.error("record : {}, exception : {}", record, e.getCause());
-//			new DeadLetterPublishingRecoverer(kafkaTemplate);
-//		}, new FixedBackOff(1000L, 3L));
 		DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate);
 		return new DefaultErrorHandler(recoverer, new FixedBackOff(1000L, 3L));
 	}
