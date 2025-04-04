@@ -13,7 +13,6 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.CommonErrorHandler;
-import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.util.backoff.FixedBackOff;
@@ -54,9 +53,6 @@ public class KafkaConsumerConfig {
 		ConcurrentKafkaListenerContainerFactory<String, Event> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory());
 		factory.setCommonErrorHandler(errorHandler());
-
-		ContainerProperties containerProperties = factory.getContainerProperties();
-		containerProperties.setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
 
 		return factory;
 	}

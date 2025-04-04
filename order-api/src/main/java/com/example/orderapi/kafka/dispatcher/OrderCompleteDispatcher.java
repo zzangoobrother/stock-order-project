@@ -18,9 +18,6 @@ public class OrderCompleteDispatcher implements OrderDispatcher<OrderCompleteEve
 
     @Override
     public void execute(OrderCompleteEvent event) {
-        if (true) {
-            throw new IllegalArgumentException("");
-        }
         orderService.orderComplete(event.getOrderId());
     }
 }
