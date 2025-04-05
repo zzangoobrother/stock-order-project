@@ -1,0 +1,8 @@
+GET localhost:8083/api/v1/queue?queue=order&userId=2
+Content-Type: application/json
+
+###
+
+GET localhost:8083/api/v1/test?queue=order
+Content-Type: application/json
+Cookie: queue-wait-order-token=3e4c22f3d6a4f576c263d28527554c794ff0839f0a5b1d1375450bfaa017c802;

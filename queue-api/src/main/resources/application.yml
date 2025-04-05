@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ecommerce?useUnicode=true&serverTimezone=Asia/Seoul&autoReconnect=true&rewriteBatchedStatements=true
+    username: test
+    password: 1234
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+
+  data:
+    cluster:
+      redis:
+        host1: localhost
+        port1: 7001
+        host2: localhost
+        port2: 7002
+        host3: localhost
+        port3: 7003
+        host4: localhost
+        port4: 7004
+        host5: localhost
+        port5: 7005
+        host6: localhost
+        port6: 7006
+
+server:
+  port: 8083
+  shutdown: graceful
