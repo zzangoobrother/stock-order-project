@@ -43,7 +43,8 @@ public class KafkaProducerConfig {
 	@Bean
 	public List<NewTopic> topics() {
 		return List.of(
-			new NewTopic(TopicNames.ORDER_RESULT_TOPIC, 1, (short)1)
+				new NewTopic(TopicNames.ORDER_RESULT_TOPIC, 1, (short)1),
+				new NewTopic(TopicNames.ORDER_DLT_TOPIC, 1, (short)1)
 		);
 	}
 }

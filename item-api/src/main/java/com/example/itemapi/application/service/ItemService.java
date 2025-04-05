@@ -1,15 +1,17 @@
 package com.example.itemapi.application.service;
 
+import java.math.BigDecimal;
+
+import org.springframework.stereotype.Service;
+
 import com.example.itemapi.application.service.dto.ItemServiceDto;
 import com.example.itemapi.domain.manager.ItemManager;
 import com.example.itemapi.domain.model.Item;
 import com.example.itemapi.global.config.TopicNames;
 import com.example.itemapi.kafka.OrderEventProducer;
 import com.example.kafka.OrderCompleteEvent;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service

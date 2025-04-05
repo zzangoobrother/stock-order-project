@@ -12,8 +12,8 @@ public class OrderCompleteDispatcher implements OrderDispatcher<OrderCompleteEve
     private final OrderService orderService;
 
     @Override
-    public boolean supports(Object event) {
-        return event instanceof OrderCompleteEvent;
+    public boolean supports(String event) {
+        return event.equals(OrderCompleteEvent.class.getName());
     }
 
     @Override

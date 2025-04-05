@@ -61,7 +61,7 @@ public class OrderService {
             // 결제 실패
             // 로그를 남겨 따로 관리
             // 이벤트 처리
-            applicationEventPublisher.publishEvent(new OrderPaymentFailedEvent(paymentRequest.getClass().getSimpleName(),
+            applicationEventPublisher.publishEvent(new OrderPaymentFailedEvent(paymentRequest.getClass().getName(),
                     ObjectMapperUtils.createObjectToJson(paymentRequest)));
 
             log.error("결제 실패");

@@ -2,7 +2,7 @@ package com.example.orderapi.kafka.dispatcher;
 
 public interface OrderDispatcher<T> {
 
-    boolean supports(Object event);
+    boolean supports(String event);
 
     void execute(T event);
 }

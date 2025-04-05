@@ -1,8 +1,8 @@
 package com.example.orderapi.global.config;
 
-import com.example.kafka.Event;
-import io.confluent.kafka.serializers.KafkaAvroDeserializer;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -11,13 +11,20 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.listener.CommonErrorHandler;
+import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.util.backoff.FixedBackOff;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.example.kafka.Event;
+
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 @EnableKafka
 @Configuration
 public class KafkaConsumerConfig {
@@ -26,6 +33,8 @@ public class KafkaConsumerConfig {
 
 	private static final String SCHEMA_REGISTRY_URL_CONFIG = "schema.registry.url";
 	private static final String SCHEMA_REGISTRY_URL = "http://localhost:9001";
+
+	private final KafkaTemplate<String, Event> kafkaTemplate;
 
 	@Bean
 	public ConsumerFactory<String, Event> consumerFactory() {
@@ -48,9 +57,9 @@ public class KafkaConsumerConfig {
 		return factory;
 	}
 
-	private DefaultErrorHandler errorHandler() {
-		return new DefaultErrorHandler((record, e) -> {
-			log.error("record : {}, exception : {}", record, e.getCause());
-		}, new FixedBackOff(1000L, 3L));
+	@Bean
+	public CommonErrorHandler errorHandler() {
+		DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate);
+		return new DefaultErrorHandler(recoverer, new FixedBackOff(1000L, 3L));
 	}
 }
