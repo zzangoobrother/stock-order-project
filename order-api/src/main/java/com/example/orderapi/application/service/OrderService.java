@@ -4,17 +4,21 @@ import com.example.kafka.DecreaseStockEvent;
 import com.example.orderapi.application.service.dto.request.PaymentRequest;
 import com.example.orderapi.application.service.dto.response.ItemInfoResponse;
 import com.example.orderapi.application.service.listener.dto.OrderPaymentCompleteEvent;
+import com.example.orderapi.application.service.listener.dto.OrderPaymentFailedEvent;
 import com.example.orderapi.domain.manager.OrderManager;
 import com.example.orderapi.domain.model.Order;
 import com.example.orderapi.global.config.TopicNames;
+import com.example.orderapi.global.utils.ObjectMapperUtils;
 import com.example.orderapi.interfaces.presentation.feign.ItemClient;
 import com.example.orderapi.interfaces.presentation.feign.PaymentClient;
 import com.example.orderapi.kafka.OrderEventProducer;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class OrderService {
@@ -47,16 +51,20 @@ public class OrderService {
         Order order = orderManager.createOrder(itemId, quantity);
 
         // 결제
+        PaymentRequest paymentRequest = PaymentRequest.builder()
+                .paymentType("카드")
+                .price("10000")
+                .build();
         try {
-            PaymentRequest paymentRequest = PaymentRequest.builder()
-                    .paymentType("카드")
-                    .price("10000")
-                    .build();
             paymentClient.payment(paymentRequest);
         } catch (RuntimeException e) {
             // 결제 실패
             // 로그를 남겨 따로 관리
             // 이벤트 처리
+            applicationEventPublisher.publishEvent(new OrderPaymentFailedEvent(paymentRequest.getClass().getSimpleName(),
+                    ObjectMapperUtils.createObjectToJson(paymentRequest)));
+
+            log.error("결제 실패");
             throw new IllegalStateException("결제에 실패했습니다. 다시 시도해 주세요.");
         }
 
