@@ -1,7 +1,9 @@
 package com.example.queueapi.interfaces.presentation;
 
+import com.example.queueapi.application.global.utils.CookieUtils;
 import com.example.queueapi.application.service.QueueService;
 import com.example.queueapi.application.service.dto.QueueServiceDto;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -13,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
 
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/queue")
 @RequiredArgsConstructor
 @RestController
 public class QueueController {
@@ -21,7 +23,7 @@ public class QueueController {
 
     private final QueueService queueService;
 
-    @GetMapping("/queue")
+    @GetMapping
     public ResponseEntity<Long> registerUser(@RequestParam String queue, @RequestParam Long userId) {
         QueueServiceDto queueServiceDto = queueService.registerUser(queue, userId);
 
@@ -32,5 +34,11 @@ public class QueueController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.COOKIE, cookie.toString())
                 .body(queueServiceDto.rank());
+    }
+
+    @GetMapping("/rank")
+    public long getRankUser(@RequestParam String queue, HttpServletRequest request) {
+        String token = CookieUtils.getCookie(request, QUEUE_WAIT_TOKEN.formatted(queue));
+        return queueService.getRankUser(queue, token);
     }
 }

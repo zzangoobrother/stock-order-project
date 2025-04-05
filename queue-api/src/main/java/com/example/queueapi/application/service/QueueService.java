@@ -51,4 +51,9 @@ public class QueueService {
 
         return "";
     }
+
+    public long getRankUser(String queue, String token) {
+        Long rank = stringRedisTemplate.opsForZSet().rank(USER_QUEUE_WAIT_KEY.formatted(queue), token);
+        return rank >= 0 ? rank + 1 : rank;
+    }
 }
