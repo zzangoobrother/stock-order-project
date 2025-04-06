@@ -21,7 +21,7 @@ public class QueueService {
     private final StringRedisTemplate stringRedisTemplate;
 
     public QueueServiceDto registerUser(String queue, Long userId) {
-        String token = createdToken(queue, userId);
+        String token = createToken(queue, userId);
         long unixTimestamp = Instant.now().getEpochSecond();
         Boolean add = stringRedisTemplate.opsForZSet().add(USER_QUEUE_WAIT_KEY.formatted(queue), token, unixTimestamp);
 
@@ -33,7 +33,7 @@ public class QueueService {
         return new QueueServiceDto(token, rank >= 0 ? rank + 1 : rank);
     }
 
-    private String createdToken(String queue, Long userId) {
+    private String createToken(String queue, Long userId) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             String input = USER_QUEUE_TOKEN.formatted(queue, userId);
