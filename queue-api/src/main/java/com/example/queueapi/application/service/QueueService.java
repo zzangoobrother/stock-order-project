@@ -5,18 +5,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class QueueService {
     private final String USER_QUEUE_WAIT_KEY = "user:queue:%s:wait";
-    private final String USER_QUEUE_TOKEN = "user-queue-%s-%d";
+    private final String USER_QUEUE_TOKEN = "user:queue:%s:%d";
+    private final String USER_QUEUE_PROCEED_KEY = "user:queue:%s:proceed";
 
     private final StringRedisTemplate stringRedisTemplate;
 
@@ -54,6 +57,40 @@ public class QueueService {
 
     public long getRankUser(String queue, String token) {
         Long rank = stringRedisTemplate.opsForZSet().rank(USER_QUEUE_WAIT_KEY.formatted(queue), token);
+        if (rank == null) {
+            return -1;
+        }
+
         return rank >= 0 ? rank + 1 : rank;
+    }
+
+    public boolean isAllowedUser(String queue, Long userId, String token) {
+        if (!StringUtils.hasText(token)) {
+            return false;
+        }
+
+        Long rank = stringRedisTemplate.opsForZSet().rank(USER_QUEUE_PROCEED_KEY.formatted(queue), token);
+        if (rank == null) {
+            rank = -1L;
+        }
+
+        return rank >= 0;
+    }
+
+    /**
+     *  진입 허용
+     *  1. wait queue 사용자 제거
+     *  2. proceed queue 사용자 추가
+     */
+    public Long allowUser(String queue, int count) {
+        AtomicInteger result = new AtomicInteger();
+        stringRedisTemplate.opsForZSet().popMin(USER_QUEUE_WAIT_KEY.formatted(queue), count).forEach(it -> {
+            Boolean saveFlag = stringRedisTemplate.opsForZSet().add(USER_QUEUE_PROCEED_KEY.formatted(queue), it.getValue(), Instant.now().getEpochSecond());
+            if (saveFlag) {
+                result.getAndIncrement();
+            }
+        });
+
+        return result.longValue();
     }
 }

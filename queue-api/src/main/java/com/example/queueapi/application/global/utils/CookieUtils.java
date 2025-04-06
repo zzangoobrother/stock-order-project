@@ -4,19 +4,19 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 public class CookieUtils {
 
-    public static String getCookie(HttpServletRequest request, String target) {
+    public static Optional<String> getCookie(HttpServletRequest request, String target) {
         Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            return Arrays.stream(cookies)
-                    .filter(it -> it.getName().equalsIgnoreCase(target))
-                    .findFirst()
-                    .orElse(new Cookie(target, ""))
-                    .getValue();
+        if (cookies == null) {
+            return Optional.empty();
         }
 
-        return "";
+        return Arrays.stream(cookies)
+                .filter(cookie -> cookie.getName().equals(target))
+                .map(Cookie::getValue)
+                .findFirst();
     }
 }
