@@ -10,5 +10,6 @@ rootProject.name = 'stock-order-project'
 include(
         "item-api",
         "order-api",
-        "payment-api"
+        "payment-api",
+        "queue-api"
 )
