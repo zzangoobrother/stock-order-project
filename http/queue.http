@@ -1,8 +1,14 @@
-GET localhost:8083/api/v1/queue?queue=order&userId=1
+GET localhost:8083/api/v1/queue?queue=order&userId=18
 Content-Type: application/json
 
 ###
 
 GET localhost:8083/api/v1/queue/rank?queue=order
 Content-Type: application/json
-Cookie: queue-wait-order-token=e047e3282cef454d1f2a8945e39ffbfbe14cdbda88ddf1f9bfdaa85a68398ee5;
+Cookie: queue-wait-order-token=f4c3e2d040948546a221e8b754714d347774057790a22e8f579f21bf7d4bf3e3;
+
+###
+
+GET localhost:8083/api/v1/queue/allowed?queue=order&userId=1
+Content-Type: application/json
+Cookie: queue-wait-order-token=f4c3e2d040948546a221e8b754714d347774057790a22e8f579f21bf7d4bf3e3;

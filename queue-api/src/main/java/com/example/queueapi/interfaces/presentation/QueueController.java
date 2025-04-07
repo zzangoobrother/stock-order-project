@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
+import java.util.Optional;
 
 @RequestMapping("/api/v1/queue")
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class QueueController {
 
     private final QueueService queueService;
 
+    // 대기열 등록 및 wait token 생성
     @GetMapping
     public ResponseEntity<Long> registerUser(@RequestParam String queue, @RequestParam Long userId) {
         QueueServiceDto queueServiceDto = queueService.registerUser(queue, userId);
@@ -36,9 +38,26 @@ public class QueueController {
                 .body(queueServiceDto.rank());
     }
 
+    // 현재 대기 번호 조회
     @GetMapping("/rank")
     public long getRankUser(@RequestParam String queue, HttpServletRequest request) {
-        String token = CookieUtils.getCookie(request, QUEUE_WAIT_TOKEN.formatted(queue));
+        String token = getToken(QUEUE_WAIT_TOKEN.formatted(queue), request);
         return queueService.getRankUser(queue, token);
+    }
+
+    // 대기열 허락 여부 조회
+    @GetMapping("/allowed")
+    public boolean isAllowedUser(@RequestParam String queue, @RequestParam Long userId, HttpServletRequest request) {
+        String token = getToken(QUEUE_WAIT_TOKEN.formatted(queue), request);
+        return queueService.isAllowedUser(queue, userId, token);
+    }
+
+    private String getToken(String target, HttpServletRequest request) {
+        Optional<String> cookie = CookieUtils.getCookie(request, target);
+        if (!cookie.isPresent()) {
+            throw new IllegalArgumentException("해당 토큰을 찾을 수 없습니다.");
+        }
+
+        return cookie.get();
     }
 }
