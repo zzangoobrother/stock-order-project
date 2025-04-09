@@ -196,3 +196,32 @@ sequenceDiagram
 결제에 성공하면 주문 상태를 결제 완료 상태로 변경합니다.
 
 <br>
+
+## 5. 토큰 발급
+
+### 이벤트 시퀀스 다이어그램
+```mermaid
+sequenceDiagram
+    participant User
+    participant API
+    participant QueueService
+    participant Redis
+    
+    User->>API: 토큰 발급 요청
+    API->>QueueService: 토큰 생성 요청
+    QueueService->>QueueService: 토큰 생성
+    QueueService->>Redis: 토큰 정보 저장
+    Redis->>QueueService: 저장 완료
+    QueueService-->>Redis: 현재 대기열 상태 요청
+    Redis-->>QueueService: 현재 대기열 상태
+    QueueService-->>API: 대기열 정보 (토큰, 순서)
+    API-->>User: 대기열 정보 반환 (토큰, 순서)
+```
+
+### Description
+
+유저가 주문을 시도할 때, 토큰을 발급받습니다.  
+현재 대기열의 상태를 조회하고, 토큰 생성을 요청하여 Redis에 저장합니다.  
+생성된 토큰과 조회한 대기열의 상태 정보를 반환합니다.
+
+<br>
