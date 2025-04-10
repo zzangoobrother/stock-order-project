@@ -4,6 +4,7 @@ import com.example.itemapi.application.service.dto.ItemServiceDto;
 import com.example.itemapi.domain.manager.ItemManager;
 import com.example.itemapi.domain.model.Item;
 import com.example.itemapi.global.config.TopicNames;
+import com.example.itemapi.global.redis.RedisPublisher;
 import com.example.itemapi.kafka.OrderEventProducer;
 import com.example.kafka.OrderCompleteEvent;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +18,15 @@ public class ItemService {
 
     private final ItemManager itemManager;
     private final OrderEventProducer orderEventProducer;
+    private final RedisPublisher redisPublisher;
 
     /**
      * - 제품을 추가한다.
      * - 같은 제품명이 있는지 확인한다.
      */
     public void addItem(String name, BigDecimal price, int stock) {
-        itemManager.addItem(name, price, stock);
+        Item item = itemManager.addItem(name, price, stock);
+        redisPublisher.publish("item-cache", item.getId());
     }
 
     /**
