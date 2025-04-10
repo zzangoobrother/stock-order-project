@@ -19,7 +19,7 @@ public class ItemManager {
 
     private final ItemRepository itemRepository;
 
-    public void addItem(String name, BigDecimal price, int stock) {
+    public Item addItem(String name, BigDecimal price, int stock) {
         if (itemRepository.existsBy(name)) {
             throw new IllegalArgumentException("동일한 품목명이 존재합니다.");
         }
@@ -31,9 +31,7 @@ public class ItemManager {
                 .isDelete(false)
                 .build();
 
-        itemRepository.save(item);
-
-        // TODO : 캐시 동기화 적용 해야함, 로컬 캐시 동기화 예정이라 Redis pub/sub 사용 예정
+        return itemRepository.save(item);
     }
 
     @Transactional(readOnly = true)
