@@ -197,7 +197,7 @@ sequenceDiagram
 
 <br>
 
-## 5. 토큰 발급
+## 5. 대기열 토큰 발급
 
 ### 이벤트 시퀀스 다이어그램
 ```mermaid
@@ -211,7 +211,7 @@ sequenceDiagram
     API->>QueueService: 토큰 생성 요청
     QueueService->>QueueService: 토큰 생성
     QueueService->>Redis: 토큰 정보 저장
-    Redis->>QueueService: 저장 완료
+    Redis-->>QueueService: 저장 완료
     QueueService-->>Redis: 현재 대기열 상태 요청
     Redis-->>QueueService: 현재 대기열 상태
     QueueService-->>API: 대기열 정보 (토큰, 순서)
@@ -223,5 +223,62 @@ sequenceDiagram
 유저가 주문을 시도할 때, 토큰을 발급받습니다.  
 현재 대기열의 상태를 조회하고, 토큰 생성을 요청하여 Redis에 저장합니다.  
 생성된 토큰과 조회한 대기열의 상태 정보를 반환합니다.
+
+<br>
+
+## 6. 토큰 대기열 정보 조회
+
+### 이벤트 시퀀스 다이어그램
+```mermaid
+sequenceDiagram
+    participant User
+    participant API
+    participant QueueService
+    participant Redis
+    
+    User->>API: 대기열 정보 조회 요청(토큰 포함)
+    API->>QueueService: 현재 대기열 상태 요청
+    alt 쿠키 토큰 존재
+        QueueService->>Redis: 대기열 정보 조회(현재 순위)
+        Redis-->>QueueService: 대기열 정보
+        QueueService-->>API: 사용자의 현재 대기 상태
+        API-->>User: 대기열 정보
+    else 쿠키 토큰 미존재
+        API-->>User: 오류 메시지 반환
+    end
+```
+
+### Description
+
+토큰을 통해 대기열 정보를 조회합니다.  
+폴링으로 대기열을 확인하는 것을 전제합니다.
+
+<br>
+
+## 7. 토큰 대기열 허용 여부 조회
+
+### 이벤트 시퀀스 다이어그램
+```mermaid
+sequenceDiagram
+    participant User
+    participant API
+    participant QueueService
+    participant Redis
+    
+    User->>API: 토큰 허용 여부 조회 요청(토큰 포함)
+    API->>QueueService: 토큰 허용 여부 요청
+    alt 쿠키 토큰 존재
+        QueueService->>Redis: 진행 대기열 토큰 존재 조회
+        Redis-->>QueueService: 토큰 존재 여부
+        QueueService-->>API: 사용자의 토큰 존재 여부
+        API-->>User: 토큰 존재 true/false
+    else 쿠키 토큰 미존재
+        API-->>User: 오류 메시지 반환
+    end
+```
+
+### Description
+
+토큰을 통해 허용된 토큰 집합의 존재 유무를 조회합니다.
 
 <br>
