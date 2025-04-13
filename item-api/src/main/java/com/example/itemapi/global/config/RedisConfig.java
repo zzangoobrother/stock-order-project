@@ -1,6 +1,7 @@
 package com.example.itemapi.global.config;
 
 import com.example.itemapi.global.config.properties.RedisClusterProperties;
+import com.example.itemapi.global.redis.RedisSubscriber;
 import com.example.itemapi.global.utils.ObjectMapperUtils;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,8 +13,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -22,9 +27,10 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
 
     private final RedisClusterProperties redisClusterProperties;
+    private final RedisSubscriber redisSubscriber;
 
     @Bean
-    public LettuceConnectionFactory lettuceConnectionFactory() {
+    public RedisConnectionFactory lettuceConnectionFactory() {
         return new LettuceConnectionFactory(new RedisClusterConfiguration()
                 .clusterNode(redisClusterProperties.host1(), redisClusterProperties.port1())
                 .clusterNode(redisClusterProperties.host2(), redisClusterProperties.port2())
@@ -36,7 +42,7 @@ public class RedisConfig {
     }
 
     @Bean
-    RedisTemplate<String, Object> objectRedisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
+    RedisTemplate<String, Object> objectRedisTemplate(RedisConnectionFactory lettuceConnectionFactory) {
         PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
                 .allowIfSubType(Object.class)
                 .build();
@@ -53,5 +59,23 @@ public class RedisConfig {
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer(mapper));
 
         return template;
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisMessageListener() {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(lettuceConnectionFactory());
+        container.addMessageListener(messageListenerAdapter(), topic());
+        return container;
+    }
+
+    @Bean
+    public MessageListenerAdapter messageListenerAdapter() {
+        return new MessageListenerAdapter(redisSubscriber);
+    }
+
+    @Bean
+    public ChannelTopic topic() {
+        return new ChannelTopic("item-cache");
     }
 }

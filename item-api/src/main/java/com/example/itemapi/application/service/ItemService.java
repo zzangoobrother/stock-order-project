@@ -4,26 +4,40 @@ import com.example.itemapi.application.service.dto.ItemServiceDto;
 import com.example.itemapi.domain.manager.ItemManager;
 import com.example.itemapi.domain.model.Item;
 import com.example.itemapi.global.config.TopicNames;
+import com.example.itemapi.global.redis.RedisPublisher;
+import com.example.itemapi.interfaces.presentation.feign.ItemClient;
 import com.example.itemapi.kafka.OrderEventProducer;
 import com.example.kafka.OrderCompleteEvent;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ItemService {
 
     private final ItemManager itemManager;
     private final OrderEventProducer orderEventProducer;
+    private final RedisPublisher redisPublisher;
+    private final ItemClient itemClient;
 
     /**
      * - 제품을 추가한다.
      * - 같은 제품명이 있는지 확인한다.
      */
     public void addItem(String name, BigDecimal price, int stock) {
-        itemManager.addItem(name, price, stock);
+        Item item = itemManager.addItem(name, price, stock);
+
+        try {
+            redisPublisher.publish("item-cache", item.getId());
+        } catch (RuntimeException e) {
+            log.error("Redis pub/sub 오류, api 대체");
+            log.error("error log : {}", e);
+            itemClient.getBy(item.getId());
+        }
     }
 
     /**
