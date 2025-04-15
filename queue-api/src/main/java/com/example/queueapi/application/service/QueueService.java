@@ -26,9 +26,9 @@ public class QueueService {
     public QueueServiceDto registerUser(String queue, Long userId) {
         String token = createToken(queue, userId);
         long unixTimestamp = Instant.now().getEpochSecond();
-        Boolean add = stringRedisTemplate.opsForZSet().add(USER_QUEUE_WAIT_KEY.formatted(queue), token, unixTimestamp);
+        Boolean flag = stringRedisTemplate.opsForZSet().add(USER_QUEUE_WAIT_KEY.formatted(queue), token, unixTimestamp);
 
-        if (!add) {
+        if (!flag) {
             throw new IllegalArgumentException("");
         }
 
