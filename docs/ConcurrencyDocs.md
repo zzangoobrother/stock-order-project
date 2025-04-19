@@ -428,5 +428,254 @@ private void decreaseTestWave(Runnable action, int waveCount, int concurrencyPer
 - Redis를 이용한 분산 락을 커스텀 어노체이션과 함께 AOP를 통해 구현했다.
 
 ```java
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface DistributedLock {
 
+    String key();
+
+    TimeUnit timeUnit() default TimeUnit.SECONDS;
+
+    long waitTime() default 5L;
+
+    long leaseTime() default 3L;
+}
+
+@Order(Ordered.HIGHEST_PRECEDENCE)
+@Aspect
+@Component
+@Slf4j
+public class DistributedLockAop {
+   private static final String REDISSON_LOCK_PREFIX = "LOCK:";
+
+   private final RedissonClient redissonClient;
+
+   public DistributedLockAop(RedissonClient redissonClient) {
+      this.redissonClient = redissonClient;
+   }
+
+   @Around("@annotation(com.example.itemapi.global.annotaion.DistributedLock)")
+   public Object lock(final ProceedingJoinPoint joinPoint) throws Throwable {
+      MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+      Method method = signature.getMethod();
+      DistributedLock distributedLock = method.getAnnotation(DistributedLock.class);
+
+      String key = REDISSON_LOCK_PREFIX + CustomSpringELParser.getDynamicValue(signature.getParameterNames(), joinPoint.getArgs(), distributedLock.key());
+      RLock rLock = redissonClient.getLock(key);
+
+      try {
+         boolean available = rLock.tryLock(distributedLock.waitTime(), distributedLock.leaseTime(), distributedLock.timeUnit());
+         if (!available) {
+            return false;
+         }
+
+         return joinPoint.proceed();
+      } catch (InterruptedException e) {
+         throw new InterruptedException();
+      } finally {
+         try {
+            rLock.unlock();
+         } catch (IllegalMonitorStateException e) {
+            log.info("Redisson Lock Already UnLock {} {}", method.getName(), key);
+         }
+      }
+   }
+}
 ```
+
+### 구현 방식
+
+1. 어노테이션 정의
+   - '@DistributedLock' 어노테이션을 만들어 분산 락을 적용할 메서드를 지정한다.
+   - 락의 키, 대기시간, 임대시간 등을 설정할 수 있도록 했다.
+
+2. AOP를 이용한 락 적용
+   - 'DistributedLockAop' 클래스에서 어노테이션이 적용된 메서드 실행 전후로 락을 획득하고 해제한다.
+   - '락 획득 - 트랜잭션 시작 - 비즈니스 로직 - 트랜잭션 종료(커밋 or 롤백) - 락 반납' 순서로 동작하도록 의도해야 한다.
+   - 이와 같은 순서를 의도하기 위해 '@Order(Ordered.HIGHEST_PRECEDENCE)' 어노테이션을 적용했다.
+
+3. Redis를 이용한 락 구현
+   - 'RedissonClient' 클래스에서 Redis의 'getLock'을 이용해 락을 구현한다.
+   - 락 획득과 해제 로직을 제공한다.
+
+<br>
+
+### 코드 설명
+
+```java
+@RequiredArgsConstructor
+@Service
+public class ItemService {
+
+    private final ItemManager itemManager;
+    private final OrderEventProducer orderEventProducer;
+
+   public void decreaseStock(Long orderId, Long itemId, int decreaseStock) {
+      itemManager.decreaseStock(itemId, decreaseStock);
+   }
+}
+
+@RequiredArgsConstructor
+@Component
+public class ItemManager {
+   private final ItemRepository itemRepository;
+
+   @Transactional
+   @DistributedLock(key = "'decrease:stock:' + #itemId")
+   public Item decreaseStock(Long itemId, int decreaseCount) {
+      Item item = itemRepository.findByIdAndIsDeleteFalse(itemId).orElseThrow(() -> new IllegalArgumentException("해당 품목이 존재하지 않습니다."));
+      item.decreaseStock(decreaseCount);
+
+      return item;
+   }
+}
+```
+
+### 코드 특징
+   - '@Transactional'과 '@DistributedLock' 어노테이션의 proxy 객체 순서는 분산 락 - 트랜잭션 객체 순으로 된다.
+   - 이유는 위에서 설명한 대로 '@Order' 어노테이션을 AOP 클래스에 추가했기 때문이다.
+   - 만약 '@Order' 어노테이션이 없었다면 proxy 객체는 트랜잭션 - 분산 락 객체 순으로 동작하여 제대로된 동시성 처리가 불가해진다.
+
+### 테스트 코드
+
+```java
+@Test
+void 재고_차감_웨이브_테스트_5번_웨이브_1000명_동시_요청() throws InterruptedException {
+    ItemRequest.AddItem request = ItemRequest.AddItem.builder()
+            .name("모자")
+            .price(BigDecimal.valueOf(10_000))
+            .stock(10_000)
+            .build();
+    ExtractableResponse<Response> addResponse = 제품_등록_요청(request);
+
+    int waveCount = 5;
+    int concurrencyPerWave = 1_000;
+    decreaseTestWave(() -> 재고_차감_요청(1L, 1), waveCount, concurrencyPerWave);
+}
+
+private void decreaseTestWave(Runnable action, int waveCount, int concurrencyPerWave) throws InterruptedException {
+    int stock = 제품_단건_조회_요청(1L).jsonPath().getInt("stock");
+
+    ExecutorService executorService = Executors.newFixedThreadPool(32);
+
+    for (int wave = 1; wave <= waveCount; wave++) {
+        CountDownLatch latch = new CountDownLatch(concurrencyPerWave);
+
+        for (int i = 0; i < concurrencyPerWave; i++) {
+            executorService.submit(() -> {
+                try {
+                    action.run();
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+
+        long sleepTime = (long) (500 + Math.random() * 1000);
+        Thread.sleep(sleepTime);
+    }
+
+    executorService.shutdown();
+    int resultStock = 제품_단건_조회_요청(1L).jsonPath().getInt("stock");
+
+    long totalOrders = (long) waveCount * concurrencyPerWave;
+
+    long expected = stock - totalOrders;
+    long actual = resultStock;
+
+    assertThat(expected).isEqualTo(actual);
+$}
+```
+
+### 테스트 통과
+![distributed_lock_result.png](../image/distributed_lock_result.png)
+
+- 최종 결과 모두 정상적으로 동작한다.
+
+<br>
+
+### 결론 및 고찰
+
+1. 분산 환경 대응 :
+   - Redis를 이용한 분산 락은 여러 서버에서 동작하는 애플리케이션의 동시성 문제를 효과적으로 해결할 수 있다.
+
+2. AOP 활용 : 
+   - AOP를 통해 비즈니스 로직과 동시성 제어 로직을 깔끔하게 분리할 수 있었다.
+
+3. 구조적 개선 : 
+   - 중간 레이어를 도입함으로써 관심사를 명확히 분리하고 AOP 적용 문제를 해결했다.
+
+4. 성능과 신뢰성 :
+   - 분산 락을 통해 데이터의 정합성을 보장하면서도, Redis의 빠른 처리 속도로 인해 성능 저하를 최소화할 수 있었다.
+   - 그러나 Redis 서버의 장애 상황에 대한 대비책도 고려해야 한다.
+
+<br>
+
+## 5. 최종 동시성 처리 방법
+
+### 재고 차감 기능 구현
+
+1. 아키텍쳐 설계
+   - 서비스 레이어 (Itemservice) : 전체적인 예약 로직 조정
+   - 락 관리 레이어 (ItemLockManager) : 분산 락 적용
+   - 트랜잭션 관리 및 비즈니스 레이어 (ItemManager) : 재고 차감 처리 및 트랜잭션 관리
+
+2. 동시성 제어 전략
+   - Redis를 이용한 분산 락 (DistributedLockAop) : 대규모 동시성 요청 처리
+   - 비관적 락 (PESSIMISTIC_READ) : 데이터베이스 수준에서의 동시성 제어
+   - 이중 락 전략 : Redis 장애 시 바관적 락으로 대체 가능하도록 함
+
+```java
+@RequiredArgsConstructor
+@Service
+public class ItemService {
+
+    private final ItemLockManager itemLockManager;
+
+   public void decreaseStock(Long orderId, Long itemId, int decreaseStock) {
+      itemLockManager.decreaseStock(itemId, decreaseStock);
+   }
+}
+
+@RequiredArgsConstructor
+@Component
+public class ItemLockManager {
+
+   private final ItemManager itemManager;
+
+   @DistributedLock(key = "'decrease:stock:' + #itemId")
+   public Item decreaseStock(Long itemId, int decreaseCount) {
+      return itemManager.pessimisticDecreaseStock(itemId, decreaseCount);
+   }
+}
+
+@Transactional
+public Item pessimisticDecreaseStock(Long itemId, int decreaseCount) {
+   Item item = itemRepository.findByIdAndIsDeleteFalse(itemId).orElseThrow(() -> new IllegalArgumentException("해당 품목이 존재하지 않습니다."));
+   item.decreaseStock(decreaseCount);
+
+   return item;
+}
+
+@Lock(LockModeType.PESSIMISTIC_WRITE)
+@Query("select i from Item i where i.id = :itemId and i.isDelete = false ")
+Optional<Item> findByIdAndDelete(Long itemId);
+```
+
+### 구현 결정 사항 및 이유
+1. 재고 차감 도잇성 제어 :
+   - 이중 락 전략 (분산 락 + 비관적 락) :
+   - Redis 분산 락으로 1차 도잇성 제어를 수행한다.
+   - 비관적 락으로 2차 안전장치를 마련하여 데이터 정합성을 보장한다.
+
+## 최종 결론
+
+1. 동시성 제어의 효과적인 구현 :
+   - 분산 락과 비관적 락의 조합을 통해 동시성 제어의 목적을 달성했다.
+   - 대규모 동시 요청 상황에서도 데이터 정합성을 유지할 수 있을을 확인했다.
+
+2. 성능과 정확성의 균형 :
+   - Redis를 활용한 분산 락으로 빠른 응답 시간을 유지하면서도 정확한 동시성 제어를 구현했다.
+   - 비관적 락을 2차 안전장치로 사용하여 데이터베이스 수준의 안전성을 보장하도록 했다.
