@@ -64,7 +64,7 @@ public class QueueService {
         return rank >= 0 ? rank + 1 : rank;
     }
 
-    public boolean isAllowedUser(String queue, Long userId, String token) {
+    public boolean isAllowedUser(String queue, String token) {
         if (!StringUtils.hasText(token)) {
             return false;
         }

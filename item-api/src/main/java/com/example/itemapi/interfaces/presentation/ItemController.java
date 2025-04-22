@@ -1,6 +1,7 @@
 package com.example.itemapi.interfaces.presentation;
 
 import com.example.itemapi.application.service.ItemService;
+import com.example.itemapi.interfaces.presentation.feign.QueueClient;
 import com.example.itemapi.interfaces.presentation.request.ItemRequest;
 import com.example.itemapi.interfaces.presentation.response.ItemInfoResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class ItemController {
 
-    public final ItemService itemService;
+    private final ItemService itemService;
+    private final QueueClient queueClient;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/items")
@@ -24,6 +26,7 @@ public class ItemController {
 
     @GetMapping("/items/{itemId}")
     public ResponseEntity<ItemInfoResponse> getBy(@PathVariable(name = "itemId") Long itemId) {
+        validateQueueProceed();
         ItemInfoResponse itemInfoResponse = ItemInfoResponse.toItemInfoResponse(itemService.getBy(itemId));
         return ResponseEntity.ok().body(itemInfoResponse);
     }
@@ -32,5 +35,12 @@ public class ItemController {
     public ResponseEntity<Void> deleteBy(@PathVariable Long itemId) {
         itemService.deleteBy(itemId);
         return ResponseEntity.noContent().build();
+    }
+
+    private void validateQueueProceed() {
+        boolean result = queueClient.getBy("order");
+        if (!result) {
+            throw new IllegalArgumentException("토큰 확인 필요");
+        }
     }
 }

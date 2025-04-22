@@ -47,9 +47,9 @@ public class QueueController {
 
     // 대기열 허락 여부 조회
     @GetMapping("/allowed")
-    public boolean isAllowedUser(@RequestParam String queue, @RequestParam Long userId, HttpServletRequest request) {
+    public boolean isAllowedUser(@RequestParam String queue, HttpServletRequest request) {
         String token = getToken(QUEUE_WAIT_TOKEN.formatted(queue), request);
-        return queueService.isAllowedUser(queue, userId, token);
+        return queueService.isAllowedUser(queue, token);
     }
 
     private String getToken(String target, HttpServletRequest request) {
