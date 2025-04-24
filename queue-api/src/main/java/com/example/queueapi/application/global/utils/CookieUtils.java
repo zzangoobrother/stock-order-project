@@ -1,15 +1,13 @@
 package com.example.queueapi.application.global.utils;
 
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Arrays;
 import java.util.Optional;
 
 public class CookieUtils {
 
-    public static Optional<String> getCookie(HttpServletRequest request, String target) {
-        Cookie[] cookies = request.getCookies();
+    public static Optional<String> getCookie(Cookie[] cookies, String target) {
         if (cookies == null) {
             return Optional.empty();
         }

@@ -7,6 +7,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public class FeignCookieInterceptor implements RequestInterceptor {
     @Override
     public void apply(RequestTemplate requestTemplate) {
@@ -17,13 +20,10 @@ public class FeignCookieInterceptor implements RequestInterceptor {
             throw new IllegalArgumentException("토큰을 입력해주세요.");
         }
 
-        if (cookies.length > 0) {
-            StringBuilder sb = new StringBuilder();
-            for (Cookie cookie : cookies) {
-                sb.append(cookie.getName() + "=" + cookie.getValue() + ";");
-            }
+        String cookieStr = Arrays.stream(cookies)
+                .map(it -> it.getName() + "=" + it.getValue())
+                .collect(Collectors.joining("; "));
 
-            requestTemplate.header("Cookie", String.valueOf(sb));
-        }
+        requestTemplate.header("Cookie", cookieStr);
     }
 }
