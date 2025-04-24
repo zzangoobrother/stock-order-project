@@ -1,5 +1,6 @@
 POST localhost:8081/api/v1/orders
 Content-Type: application/json
+Cookie: queue-wait-order-token=f4c3e2d040948546a221e8b754714d347774057790a22e8f579f21bf7d4bf3e3;
 
 {
   "itemId" : "1",

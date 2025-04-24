@@ -3,6 +3,7 @@ package com.example.queueapi.interfaces.presentation;
 import com.example.queueapi.application.global.utils.CookieUtils;
 import com.example.queueapi.application.service.QueueService;
 import com.example.queueapi.application.service.dto.QueueServiceDto;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -41,19 +42,19 @@ public class QueueController {
     // 현재 대기 번호 조회
     @GetMapping("/rank")
     public long getRankUser(@RequestParam String queue, HttpServletRequest request) {
-        String token = getToken(QUEUE_WAIT_TOKEN.formatted(queue), request);
+        String token = getToken(QUEUE_WAIT_TOKEN.formatted(queue), request.getCookies());
         return queueService.getRankUser(queue, token);
     }
 
     // 대기열 허락 여부 조회
     @GetMapping("/allowed")
-    public boolean isAllowedUser(@RequestParam String queue, @RequestParam Long userId, HttpServletRequest request) {
-        String token = getToken(QUEUE_WAIT_TOKEN.formatted(queue), request);
-        return queueService.isAllowedUser(queue, userId, token);
+    public boolean isAllowedUser(@RequestParam String queue, HttpServletRequest request) {
+        String token = getToken(QUEUE_WAIT_TOKEN.formatted(queue), request.getCookies());
+        return queueService.isAllowedUser(queue, token);
     }
 
-    private String getToken(String target, HttpServletRequest request) {
-        Optional<String> cookie = CookieUtils.getCookie(request, target);
+    private String getToken(String target, Cookie[] cookies) {
+        Optional<String> cookie = CookieUtils.getCookie(cookies, target);
         if (!cookie.isPresent()) {
             throw new IllegalArgumentException("해당 토큰을 찾을 수 없습니다.");
         }
