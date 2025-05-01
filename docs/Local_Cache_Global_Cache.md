@@ -211,3 +211,87 @@ public void deleteBy(Long itemId) {
   - ex) 제품 제고가 매진되면 즉시 캐시를 갱신한다.
 
 <br>
+
+## 7) 글로벌 Cache 적용
+### 7.1 글로벌 Cache 설정 코드 분석
+
+```java
+@RequiredArgsConstructor
+@Configuration
+@EnableCaching
+public class CacheConfig {
+  @Bean("redisCacheManger")
+  public CacheManager redisCacheManager(LettuceConnectionFactory lettuceConnectionFactory) {
+    PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
+            .allowIfSubType(Object.class)
+            .build();
+
+    ObjectMapper mapper = ObjectMapperUtils.objectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .registerModule(new JavaTimeModule())
+            .activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.NON_FINAL)
+            .disable(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS);
+
+    RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+            .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+            .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer(mapper)));
+
+    return RedisCacheManager.RedisCacheManagerBuilder
+            .fromConnectionFactory(lettuceConnectionFactory)
+            .cacheDefaults(redisCacheConfiguration)
+            .build();
+  }
+}
+```
+
+- `RedisCacheManager` Bean을 정의하여 Redis 캐시 매니저를 커스터마이즈한다.
+- `serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))` : 캐시 키를 문자열로 직렬화한다.
+- `serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer(mapper))` : 캐시 값을 JSON 형식으로 직렬화한다.
+
+## 8) 최종 Cache 처리 방법
+### 7.1 Cache 계층화
+
+1. 아키텍쳐 설계
+   - 서비스 레이어 (ItemService) : 전체적인 재고 처리 로직 조정
+   - 캐시 계층 레이어 (ItemManager) : 로컬 Cache, 글로벌 Cache 적용
+
+2. Cache 계층화
+   - 로컬 Cache : Spring cache 처리
+   - Redis를 이용한 글로벌 Cache : Redis cache 처리
+
+```java
+@Slf4j
+@RequiredArgsConstructor
+@Service
+public class ItemService {
+
+  private final ItemManager itemManager;
+  
+  public ItemServiceDto.ItemInfo getBy(Long itemId) {
+    Item item = itemManager.getBy(itemId);
+    return ItemServiceDto.ItemInfo.toItemInfo(item);
+  }
+}
+
+@Transactional(readOnly = true)
+@Caching(cacheable = {
+        @Cacheable(cacheManager = "localCacheManager", cacheNames = "itemInfo", key = "'itemInfo:' + #itemId", sync = true),
+        @Cacheable(cacheManager = "redisCacheManger", cacheNames = "itemInfo", key = "'itemInfo:' + #itemId", sync = true)
+})
+public Item getBy(Long itemId) {
+  return itemRepository.findByIdAndIsDeleteFalse(itemId).orElseThrow(() -> new IllegalArgumentException("해당 품목이 존재하지 않습니다."));
+}
+```
+
+### 구현 결정 사항 및 이유
+1. Cache를 통한 성능 개선 :
+   - 2 계층 적용 (로컬 cache + 글로벌 cache) :
+   - 로컬 cache로 1차 cache 조회를 수행한다.
+   - 글로벌 cache로 2차 조회를 마련하여 성능 개선을 한다.
+
+## 최종 결론
+
+- 데이터베이스 부하 감소 : 반복적인 쿼리를 cache로 대체하여 데이터베이스 부하를 크게 줄인다.
+- 응답 시간 단축 : 복잡한 쿼리 결과를 cache에서 즉시 제공하여 응답 시간을 대폭 단축시킨다.
+- 데이터 일관성 유지 : 적절한 TTL 설정과 상태 변경 시 즉시 cache 무효화를 통해 데이터의 일관성을 유지한다.
+- 실시간성 보장 : 중요 데이터의 빠른 갱신과 즉시 cache 무효화를 통해 실시간 정보를 제공한다.
