@@ -11,5 +11,7 @@ include(
         "item-api",
         "order-api",
         "payment-api",
-        "queue-api"
+        "queue-api",
+        "gateway",
+        "discovery-service"
 )
