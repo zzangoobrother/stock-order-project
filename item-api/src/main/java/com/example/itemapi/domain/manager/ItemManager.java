@@ -36,8 +36,8 @@ public class ItemManager {
 
     @Transactional(readOnly = true)
     @Caching(cacheable = {
-            @Cacheable(cacheManager = "localCacheManager", cacheNames = "itemInfo", key = "'itemInfo:' + #itemId", sync = true),
-            @Cacheable(cacheManager = "redisCacheManger", cacheNames = "itemInfo", key = "'itemInfo:' + #itemId", sync = true)
+            @Cacheable(cacheManager = "localCacheManager", cacheNames = "itemInfo", key = "'itemInfo:' + #itemId"),
+            @Cacheable(cacheManager = "redisCacheManger", cacheNames = "itemInfo", key = "'itemInfo:' + #itemId")
     })
     public Item getBy(Long itemId) {
         return itemRepository.findByIdAndIsDeleteFalse(itemId).orElseThrow(() -> new IllegalArgumentException("해당 품목이 존재하지 않습니다."));

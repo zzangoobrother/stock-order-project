@@ -12,6 +12,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'com.github.ben-manes.caffeine:caffeine'
 
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
@@ -19,12 +21,6 @@ dependencies {
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'io.rest-assured:rest-assured:5.4.0'
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
 }
 
 tasks.register("prepareKotlinBuildScriptModel") {}

@@ -29,7 +29,7 @@ public class QueueService {
         Boolean flag = stringRedisTemplate.opsForZSet().add(USER_QUEUE_WAIT_KEY.formatted(queue), token, unixTimestamp);
 
         if (!flag) {
-            throw new IllegalArgumentException("");
+            throw new IllegalArgumentException("동일한 token이 존재합니다.");
         }
 
         Long rank = stringRedisTemplate.opsForZSet().rank(USER_QUEUE_WAIT_KEY.formatted(queue), token);

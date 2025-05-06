@@ -1,0 +1,35 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: item-api
+          uri: lb://ITEM-API
+          predicates:
+            - Path=/api/v1/items/**
+
+        - id: order-api
+          uri: lb://ORDER-API
+          predicates:
+            - Path=/api/v1/orders/**
+
+        - id: payment-api
+          uri: lb://PAYMENT-API
+          predicates:
+            - Path=/api/v1/payments/**
+
+        - id: queue-api
+          uri: lb://QUEUE-API
+          predicates:
+            - Path=/api/v1/queue/**
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
