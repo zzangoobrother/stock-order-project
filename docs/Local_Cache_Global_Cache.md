@@ -1,4 +1,4 @@
-# Cache 사용과 대기열 시스템을 위한 Redis 사용
+# Cache 사용과 Cache 계층형 구현
 
 # 1. Cache 도입을 통한 성능 개선
 
