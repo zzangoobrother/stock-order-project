@@ -16,6 +16,12 @@ Cookie: queue-wait-order-token=b5deed527c1b49f3307e36ab221cb4c42a543cd811a03a00e
 
 ###
 
+GET localhost:8080/api/v1/items/test
+Content-Type: application/json
+Cookie: queue-wait-order-token=b5deed527c1b49f3307e36ab221cb4c42a543cd811a03a00ed6cf71a5786da97;
+
+###
+
 POST localhost:8080/api/v1/items/1/decrease-stock
 Content-Type: application/json
 

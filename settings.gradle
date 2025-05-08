@@ -13,5 +13,6 @@ include(
         "payment-api",
         "queue-api",
         "gateway",
-        "discovery-service"
+        "discovery-service",
+        "config-service"
 )
