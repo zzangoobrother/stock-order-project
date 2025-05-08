@@ -1,6 +1,7 @@
 package com.example.itemapi.interfaces.presentation;
 
 import com.example.itemapi.application.service.ItemService;
+import com.example.itemapi.global.config.properties.TestProperties;
 import com.example.itemapi.interfaces.presentation.feign.QueueClient;
 import com.example.itemapi.interfaces.presentation.request.ItemRequest;
 import com.example.itemapi.interfaces.presentation.response.ItemInfoResponse;
@@ -22,6 +23,7 @@ public class ItemController {
 
     private final ItemService itemService;
     private final QueueClient queueClient;
+    private final TestProperties testProperties;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/items")
@@ -53,5 +55,10 @@ public class ItemController {
     public ResponseEntity<Void> deleteBy(@PathVariable Long itemId) {
         itemService.deleteBy(itemId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/items/test")
+    public void test() {
+        System.out.println(testProperties.test());
     }
 }
