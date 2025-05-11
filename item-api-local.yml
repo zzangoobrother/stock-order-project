@@ -9,4 +9,4 @@ eureka:
       defaultZone: http://localhost:8761/eureka
 
 bus:
-  test: bus-test1
+  test: bus-test2
