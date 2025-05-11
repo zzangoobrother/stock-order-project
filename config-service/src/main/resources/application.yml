@@ -10,3 +10,12 @@ spring:
       server:
         git:
           uri: https://github.com/zzangoobrother/stock-order-project
+
+  kafka:
+    bootstrap-servers: localhost:10000,localhost:10001,localhost:10002
+
+management:
+  endpoint:
+    web:
+      exposure:
+        include: busrefresh
