@@ -1,0 +1,9 @@
+POST localhost:8887/actuator/busrefresh
+
+###
+
+POST localhost:8084/actuator/refresh
+
+###
+
+GET localhost:8084/actuator/refresh
