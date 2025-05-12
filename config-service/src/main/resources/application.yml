@@ -10,12 +10,15 @@ spring:
       server:
         git:
           uri: https://github.com/zzangoobrother/stock-order-project
-
-  kafka:
-    bootstrap-servers: localhost:10000,localhost:10001,localhost:10002
+    bus:
+      enabled: true
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:10000,localhost:10001,localhost:10002
 
 management:
-  endpoint:
+  endpoints:
     web:
       exposure:
-        include: busrefresh
+        include: busrefresh, refresh
