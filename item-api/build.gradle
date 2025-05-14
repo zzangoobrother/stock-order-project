@@ -1,5 +1,10 @@
 plugins {
     id 'com.github.davidmc24.gradle.plugin.avro' version '1.9.1' // 아브로 플러그인 추가
+    id "org.asciidoctor.jvm.convert" version "4.0.4"
+}
+
+configurations {
+    asciidoctorExt
 }
 
 generateAvroJava { // 아브로 스키마 생성
@@ -8,6 +13,7 @@ generateAvroJava { // 아브로 스키마 생성
 }
 
 repositories {
+    mavenCentral()
     maven {
         url 'https://packages.confluent.io/maven/' // 아브로 레포지토리 추가
     }
@@ -45,6 +51,10 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
+    // rest docs
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:3.0.3'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-restassured:3.0.3'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'it.ozimov:embedded-redis:0.7.2'
 
@@ -53,3 +63,39 @@ dependencies {
 }
 
 tasks.register("prepareKotlinBuildScriptModel") {}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
+test {
+    useJUnitPlatform()
+    outputs.dir snippetsDir
+}
+
+task testDocument(type: Test) {
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching "*.documentation.*"
+    }
+}
+
+asciidoctor {
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
+}
+
+bootJar {
+    dependsOn asciidoctor
+    from ("${asciidoctor.outputDir}/html5") {
+        into 'static/docs'
+    }
+}
+
+task copyDocument(type: Copy) {
+    dependsOn asciidoctor
+
+    from file("build/docs/asciidoc")
+    into file("src/main/resources/static/docs")
+}
