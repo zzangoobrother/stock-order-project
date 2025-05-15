@@ -1,6 +1,5 @@
-package com.example.itemapi.global.config;
+package com.example.itemapi.documentation;
 
-import com.example.itemapi.global.config.properties.RedisClusterProperties;
 import com.example.itemapi.global.redis.RedisSubscriber;
 import com.example.itemapi.global.utils.ObjectMapperUtils;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -9,7 +8,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -24,22 +24,46 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Profile("local")
-@RequiredArgsConstructor
 @Configuration
 public class RedisConfig {
 
-    private final RedisClusterProperties redisClusterProperties;
-    private final RedisSubscriber redisSubscriber;
+    @Value("${spring.data.cluster.redis.host1}")
+    String host1;
+    @Value("${spring.data.cluster.redis.port1}")
+    int port1;
+    @Value("${spring.data.cluster.redis.host2}")
+    String host2;
+    @Value("${spring.data.cluster.redis.port2}")
+    int port2;
+    @Value("${spring.data.cluster.redis.host3}")
+    String host3;
+    @Value("${spring.data.cluster.redis.port3}")
+    int port3;
+    @Value("${spring.data.cluster.redis.host4}")
+    String host4;
+    @Value("${spring.data.cluster.redis.port4}")
+    int port4;
+    @Value("${spring.data.cluster.redis.host5}")
+    String host5;
+    @Value("${spring.data.cluster.redis.port5}")
+    int port5;
+    @Value("${spring.data.cluster.redis.host6}")
+    String host6;
+    @Value("${spring.data.cluster.redis.port6}")
+    int port6;
+
+    @Autowired
+    RedisSubscriber redisSubscriber;
 
     @Bean
     public RedisConnectionFactory lettuceConnectionFactory() {
         return new LettuceConnectionFactory(new RedisClusterConfiguration()
-                .clusterNode(redisClusterProperties.host1(), redisClusterProperties.port1())
-                .clusterNode(redisClusterProperties.host2(), redisClusterProperties.port2())
-                .clusterNode(redisClusterProperties.host3(), redisClusterProperties.port3())
-                .clusterNode(redisClusterProperties.host4(), redisClusterProperties.port4())
-                .clusterNode(redisClusterProperties.host5(), redisClusterProperties.port5())
-                .clusterNode(redisClusterProperties.host6(), redisClusterProperties.port6())
+                .clusterNode(host1, port1)
+                .clusterNode(host2, port2)
+                .clusterNode(host3, port3)
+                .clusterNode(host4, port4)
+                .clusterNode(host5, port5)
+                .clusterNode(host6, port6)
         );
     }
 

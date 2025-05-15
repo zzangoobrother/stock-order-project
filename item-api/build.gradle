@@ -55,6 +55,10 @@ dependencies {
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:3.0.3'
     testImplementation 'org.springframework.restdocs:spring-restdocs-restassured:3.0.3'
 
+    testImplementation "org.testcontainers:testcontainers:1.20.4"
+    testImplementation "org.testcontainers:junit-jupiter:1.20.4"
+    testImplementation "org.testcontainers:mysql:1.20.4"
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'it.ozimov:embedded-redis:0.7.2'
 
