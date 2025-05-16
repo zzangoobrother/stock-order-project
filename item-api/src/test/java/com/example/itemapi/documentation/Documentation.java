@@ -17,7 +17,7 @@ import io.restassured.specification.RequestSpecification;
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith({RestDocumentationExtension.class})
-public class Documentation {
+public class Documentation extends TestContainerSupport {
 
 	@LocalServerPort
 	int port;

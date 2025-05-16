@@ -6,7 +6,12 @@ import static org.springframework.restdocs.restassured.RestAssuredRestDocumentat
 
 import java.math.BigDecimal;
 
+import com.example.itemapi.global.redis.RedisPublisher;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.springframework.cache.CacheManager;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -15,6 +20,7 @@ import com.example.itemapi.interfaces.presentation.feign.QueueClient;
 import com.example.itemapi.interfaces.presentation.request.ItemRequest;
 
 import io.restassured.RestAssured;
+import org.springframework.test.context.bean.override.mockito.MockitoBeans;
 
 public class ItemDocumentation extends Documentation {
 
