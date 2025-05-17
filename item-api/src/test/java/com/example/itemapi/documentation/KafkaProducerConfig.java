@@ -1,5 +1,6 @@
-package com.example.itemapi.global.config;
+package com.example.itemapi.documentation;
 
+import com.example.itemapi.global.config.TopicNames;
 import com.example.kafka.Event;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -17,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Profile("local")
+@Profile("test")
 @EnableKafka
 @Configuration
 public class KafkaProducerConfig {

@@ -1,8 +1,7 @@
-package com.example.itemapi.global.config;
+package com.example.itemapi.documentation;
 
 import com.example.kafka.Event;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -19,16 +18,13 @@ import org.springframework.util.backoff.FixedBackOff;
 import java.util.HashMap;
 import java.util.Map;
 
-@Profile("local")
-@Slf4j
+@Profile("test")
 @EnableKafka
 @Configuration
 public class KafkaConsumerConfig {
 
 	private static final String BOOTSTRAP_SERVER = "localhost:10000";
 
-	private static final String SCHEMA_REGISTRY_URL_CONFIG = "schema.registry.url";
-	private static final String SCHEMA_REGISTRY_URL = "http://localhost:9001";
 
 	@Bean
 	public ConsumerFactory<String, Event> consumerFactory() {
@@ -36,7 +32,6 @@ public class KafkaConsumerConfig {
 		config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER);
 		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class);
-		config.put(SCHEMA_REGISTRY_URL_CONFIG, SCHEMA_REGISTRY_URL);
 		config.put("specific.avro.reader", true);
 
 		return new DefaultKafkaConsumerFactory<>(config);
@@ -56,7 +51,6 @@ public class KafkaConsumerConfig {
 
 	private DefaultErrorHandler errorHandler() {
 		return new DefaultErrorHandler((record, e) -> {
-			log.error("record : {}, exception : {}", record, e.getCause());
 		}, new FixedBackOff(1000L, 3L));
 	}
 }
