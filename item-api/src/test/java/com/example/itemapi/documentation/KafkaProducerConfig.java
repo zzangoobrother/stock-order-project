@@ -22,7 +22,7 @@ import java.util.Map;
 @EnableKafka
 @Configuration
 public class KafkaProducerConfig {
-	private static final String BOOTSTRAP_SERVER = "localhost:10000";
+	private static final String BOOTSTRAP_SERVER = "localhost:9092";
 
 	private static final String SCHEMA_REGISTRY_URL_CONFIG = "schema.registry.url";
 	private static final String SCHEMA_REGISTRY_URL = "http://localhost:9001";

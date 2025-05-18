@@ -23,8 +23,10 @@ import java.util.Map;
 @Configuration
 public class KafkaConsumerConfig {
 
-	private static final String BOOTSTRAP_SERVER = "localhost:10000";
+	private static final String BOOTSTRAP_SERVER = "localhost:9092";
 
+	private static final String SCHEMA_REGISTRY_URL_CONFIG = "schema.registry.url";
+	private static final String SCHEMA_REGISTRY_URL = "http://localhost:9001";
 
 	@Bean
 	public ConsumerFactory<String, Event> consumerFactory() {
@@ -32,6 +34,7 @@ public class KafkaConsumerConfig {
 		config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER);
 		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class);
+		config.put(SCHEMA_REGISTRY_URL_CONFIG, SCHEMA_REGISTRY_URL);
 		config.put("specific.avro.reader", true);
 
 		return new DefaultKafkaConsumerFactory<>(config);

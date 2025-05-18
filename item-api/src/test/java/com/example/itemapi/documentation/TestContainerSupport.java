@@ -5,9 +5,10 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.JdbcDatabaseContainer;
-import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.kafka.ConfluentKafkaContainer;
+import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @ActiveProfiles("test")
@@ -16,19 +17,19 @@ public abstract class TestContainerSupport {
     private static final String MYSQL_IMAGE = "mysql:8";
     private static final String REDIS_IMAGE = "redis:latest";
     private static final int REDIS_PORT = 6379;
-    private static final String KAFKA_IMAGE = "bitnami/kafka:3.7.0";
-    private static final int KAFKA_PORT = 10000;
+    private static final String KAFKA_IMAGE = "confluentinc/cp-kafka";
+    private static final int KAFKA_PORT = 9092;
 
     private static final JdbcDatabaseContainer MYSQL;
     private static final GenericContainer REDIS;
-    private static final GenericContainer KAFKA;
+    private static final ConfluentKafkaContainer KAFKA;
 
     static {
         MYSQL = new MySQLContainer(MYSQL_IMAGE);
         REDIS = new GenericContainer(DockerImageName.parse(REDIS_IMAGE))
                 .withExposedPorts(REDIS_PORT)
                         .withReuse(true);
-        KAFKA = new GenericContainer(DockerImageName.parse(KAFKA_IMAGE))
+        KAFKA = new ConfluentKafkaContainer(DockerImageName.parse(KAFKA_IMAGE))
                 .withExposedPorts(KAFKA_PORT)
                 .withReuse(true);
 
@@ -50,6 +51,6 @@ public abstract class TestContainerSupport {
         registry.add("spring.datasource.username", MYSQL::getUsername);
         registry.add("spring.datasource.password", MYSQL::getPassword);
 
-        registry.add("spring.kafka.bootstrap-servers", () -> KAFKA.getHost() + ":" + KAFKA.getExposedPorts().get(0));
+        registry.add("spring.kafka.bootstrap-servers", KAFKA::getBootstrapServers);
     }
 }
