@@ -86,22 +86,4 @@ public class RedisConfig {
 
         return template;
     }
-
-    @Bean
-    public RedisMessageListenerContainer redisMessageListener() {
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(lettuceConnectionFactory());
-        container.addMessageListener(messageListenerAdapter(), topic());
-        return container;
-    }
-
-    @Bean
-    public MessageListenerAdapter messageListenerAdapter() {
-        return new MessageListenerAdapter(redisSubscriber);
-    }
-
-    @Bean
-    public ChannelTopic topic() {
-        return new ChannelTopic("item-cache");
-    }
 }
