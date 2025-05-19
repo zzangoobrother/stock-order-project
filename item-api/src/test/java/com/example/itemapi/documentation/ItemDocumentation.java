@@ -40,7 +40,7 @@ public class ItemDocumentation extends Documentation {
 
 		RestAssured
 			.given(spec).log().all()
-			.filter(document("/items",
+			.filter(document("item/create",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestFields(
