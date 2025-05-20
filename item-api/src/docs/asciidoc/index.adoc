@@ -12,4 +12,10 @@
 
 operation::item/create[snippets='http-request,request-body,request-fields,http-response']
 
+== 제품 상세 조회
 
+operation::item/get[snippets='http-request,path-parameters,http-response,response-body,response-fields']
+
+== 제품 삭제
+
+operation::item/get[snippets='http-request,path-parameters,http-response,response-fields']
