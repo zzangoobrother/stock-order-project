@@ -1,4 +1,4 @@
-package com.example.queueapi.application.global.utils;
+package com.example.queueapi.global.utils;
 
 import jakarta.servlet.http.Cookie;
 

@@ -1,0 +1,13 @@
+= ORDER API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+== ORDER API
+
+== 주문하기
+
+operation::order/create[snippets='http-request,request-body,request-fields,http-response']

@@ -1,4 +1,4 @@
-package com.example.queueapi.application.global.config.properties;
+package com.example.queueapi.global.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

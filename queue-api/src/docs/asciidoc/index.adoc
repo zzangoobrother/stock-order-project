@@ -1,0 +1,21 @@
+= QUEUE API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+== QUEUE API
+
+== 대기열 등록 및 wait token 생성
+
+operation::queue/register[snippets='http-request,http-response,response-body']
+
+== 현재 대기 번호 조회
+
+operation::queue/rank[snippets='http-request,http-response,response-body']
+
+== 대기열 허락 여부 조회
+
+operation::queue/allowed[snippets='http-request,http-response,response-body']
