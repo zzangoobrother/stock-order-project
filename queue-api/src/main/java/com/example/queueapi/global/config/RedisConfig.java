@@ -1,12 +1,14 @@
-package com.example.queueapi.application.global.config;
+package com.example.queueapi.global.config;
 
-import com.example.queueapi.application.global.config.properties.RedisClusterProperties;
+import com.example.queueapi.global.config.properties.RedisClusterProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 
+@Profile("local")
 @RequiredArgsConstructor
 @Configuration
 public class RedisConfig {

@@ -1,6 +1,6 @@
 package com.example.queueapi.interfaces.presentation;
 
-import com.example.queueapi.application.global.utils.CookieUtils;
+import com.example.queueapi.global.utils.CookieUtils;
 import com.example.queueapi.application.service.QueueService;
 import com.example.queueapi.application.service.dto.QueueServiceDto;
 import jakarta.servlet.http.Cookie;
