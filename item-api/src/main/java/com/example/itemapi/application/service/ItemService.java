@@ -28,7 +28,7 @@ public class ItemService {
      * - 제품을 추가한다.
      * - 같은 제품명이 있는지 확인한다.
      */
-    public void addItem(String name, BigDecimal price, int stock) {
+    public ItemServiceDto.CreateItem addItem(String name, BigDecimal price, int stock) {
         Item item = itemManager.addItem(name, price, stock);
 
         try {
@@ -38,6 +38,8 @@ public class ItemService {
             log.error("error log : {}", e);
             itemClient.getBy(item.getId());
         }
+
+        return new ItemServiceDto.CreateItem(item.getId());
     }
 
     /**

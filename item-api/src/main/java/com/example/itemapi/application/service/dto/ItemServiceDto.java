@@ -5,6 +5,10 @@ import lombok.Builder;
 
 public record ItemServiceDto() {
 
+    public record CreateItem(
+        Long itemId
+    ) {}
+
     public record ItemInfo(
             Long itemId,
             String name,

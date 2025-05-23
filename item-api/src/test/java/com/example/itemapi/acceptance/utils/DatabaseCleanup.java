@@ -29,10 +29,10 @@ public class DatabaseCleanup implements InitializingBean {
 
     @Transactional
     public void execute() {
-        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
+        jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
         for (String tableName : tableNames) {
             jdbcTemplate.execute("TRUNCATE TABLE " + tableName);
         }
-        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
+        jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
     }
 }

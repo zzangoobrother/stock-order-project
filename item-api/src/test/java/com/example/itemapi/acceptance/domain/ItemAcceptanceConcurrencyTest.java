@@ -1,5 +1,6 @@
 package com.example.itemapi.acceptance.domain;
 
+import com.example.itemapi.acceptance.AcceptanceTest;
 import com.example.itemapi.interfaces.presentation.request.ItemRequest;
 import groovy.util.logging.Slf4j;
 import io.restassured.response.ExtractableResponse;
@@ -11,14 +12,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 
-import static com.example.itemapi.acceptance.domain.ItemSteps.*;
+import static com.example.itemapi.acceptance.ItemSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @Slf4j
-public class ItemAcceptanceTest extends AcceptanceTest {
+public class ItemAcceptanceConcurrencyTest extends AcceptanceTest {
 
     @Test
     void 동시에_재고_차감_2개() {

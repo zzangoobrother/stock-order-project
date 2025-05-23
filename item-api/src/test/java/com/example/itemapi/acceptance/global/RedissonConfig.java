@@ -1,4 +1,4 @@
-package com.example.itemapi.documentation;
+package com.example.itemapi.acceptance.global;
 
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;

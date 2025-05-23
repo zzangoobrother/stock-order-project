@@ -1,6 +1,7 @@
 package com.example.itemapi.interfaces.presentation;
 
 import com.example.itemapi.application.service.ItemService;
+import com.example.itemapi.application.service.dto.ItemServiceDto;
 import com.example.itemapi.interfaces.presentation.feign.QueueClient;
 import com.example.itemapi.interfaces.presentation.request.ItemRequest;
 import com.example.itemapi.interfaces.presentation.response.ItemInfoResponse;
@@ -25,9 +26,10 @@ public class ItemController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/items")
-    public ResponseEntity addItem(@RequestBody ItemRequest.AddItem request) {
-        itemService.addItem(request.name().trim(), request.price(), request.stock());
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> addItem(@RequestBody ItemRequest.AddItem request) {
+        ItemServiceDto.CreateItem item = itemService.addItem(request.name().trim(), request.price(),
+            request.stock());
+        return ResponseEntity.created(URI.create("/api/v1/items/" + item.itemId())).build();
     }
 
     @GetMapping("/items/{itemId}")
