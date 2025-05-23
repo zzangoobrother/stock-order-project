@@ -1,4 +1,4 @@
-package com.example.itemapi.documentation;
+package com.example.itemapi.acceptance.global;
 
 import com.example.kafka.Event;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;

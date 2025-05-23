@@ -1,4 +1,4 @@
-package com.example.itemapi.documentation;
+package com.example.itemapi.acceptance.global;
 
 import com.example.itemapi.global.redis.RedisSubscriber;
 import com.example.itemapi.global.utils.ObjectMapperUtils;

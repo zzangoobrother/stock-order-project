@@ -64,8 +64,6 @@ public class ItemDocumentation extends Documentation {
 
 	@Test
 	void getBy() {
-		ItemInfoResponse response = new ItemInfoResponse(1L, "모자", "10000", 10);
-
 		when(queueClient.getBy(anyString())).thenReturn(true);
 
 		ItemServiceDto.ItemInfo itemInfo = ItemServiceDto.ItemInfo.builder().itemId(1L).name("모자").price("10000").stock(10).build();
