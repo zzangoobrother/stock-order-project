@@ -56,7 +56,7 @@ public class RedisConfig {
 //    int port6;
 
     @Bean
-    public RedisConnectionFactory lettuceConnectionFactory() {
+    public LettuceConnectionFactory lettuceConnectionFactory() {
         return new LettuceConnectionFactory(new RedisClusterConfiguration()
                 .clusterNode(host1, port1)
                 .clusterNode(host1, port1)
