@@ -1,4 +1,4 @@
-package com.example.itemapi.acceptance.domain;
+package com.example.itemapi.acceptance;
 
 import com.example.itemapi.acceptance.utils.DataLoader;
 import com.example.itemapi.acceptance.utils.DatabaseCleanup;
